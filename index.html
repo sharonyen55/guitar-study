@@ -156,62 +156,68 @@ body{background:#0f0f0f;color:#e0e0e0;font-family:'Segoe UI',sans-serif;min-heig
 <script>
 const LKEY = 'guitar_v1';
 
+/**
+ * 💡 【防呆規範】strings / fingers 陣列弦序：【由細到粗】
+ *   index 0 = ① 弦（高音 e）  index 1 = ② 弦（B）  index 2 = ③ 弦（G）
+ *   index 3 = ④ 弦（D）       index 4 = ⑤ 弦（A）  index 5 = ⑥ 弦（低音 E）
+ * strings 值：正整數 = 格數；0 = 空弦（○）；null = 消音（×）
+ * fingers 值：1食 / 2中 / 3無 / 4小；barre 覆蓋弦用 null
+ */
 /* ── Chord data ── */
 const CHORDS = [
   {id:"Em", name:"Em", full:"E minor", type:"open",
-   strings:[null,null,2,2,null,null], open:[1,2,5,6], muted:[],
-   fingers:["","","2","1","",""], startFret:1, desc:"最常見的入門和弦"},
+   strings:[0,0,0,2,2,0], fingers:[null,null,null,2,1,null], startFret:1, desc:"最常見的入門和弦"},
+
   {id:"Am", name:"Am", full:"A minor", type:"open",
-   strings:[null,null,2,2,1,null], open:[1,6], muted:[6],
-   fingers:["","","3","2","1",""], startFret:1, desc:"民謠必備，轉位簡單"},
+   strings:[0,1,2,2,0,null], fingers:[null,1,3,2,null,null], startFret:1, desc:"民謠必備，轉位簡單"},
+
   {id:"E",  name:"E",  full:"E major", type:"open",
-   strings:[null,null,1,2,2,null], open:[1,2,6], muted:[],
-   fingers:["","","1","3","2",""], startFret:1, desc:""},
+   strings:[0,0,1,2,2,0], fingers:[null,null,1,3,2,null], startFret:1, desc:"經典大調和弦"},
+
   {id:"A",  name:"A",  full:"A major", type:"open",
-   strings:[null,null,2,2,2,null], open:[1,5], muted:[6],
-   fingers:["","","1","2","3",""], startFret:2, desc:""},
+   strings:[0,2,2,2,0,null], fingers:[null,3,2,1,null,null], startFret:1, desc:"常規舒適配置指法"},
+
   {id:"D",  name:"D",  full:"D major", type:"open",
-   strings:[null,null,null,2,3,2], open:[4], muted:[5,6],
-   fingers:["","","","1","3","2"], startFret:2, desc:""},
+   strings:[2,3,2,0,null,null], fingers:[2,3,1,null,null,null], startFret:1, desc:"開放把位核心大調"},
+
   {id:"G",  name:"G",  full:"G major", type:"open",
-   strings:[3,2,null,null,3,null], open:[2,3,4], muted:[],
-   fingers:["3","1","","","4",""], startFret:2, desc:"手指跨度較大，多練習"},
+   strings:[3,0,0,0,2,3], fingers:[4,null,null,null,1,3], startFret:1, desc:"手指跨度較大，多練習"},
+
   {id:"C",  name:"C",  full:"C major", type:"open",
-   strings:[null,3,2,null,1,null], open:[1,3,5], muted:[6],
-   fingers:["","3","2","","1",""], startFret:1, desc:""},
+   strings:[0,1,0,2,3,null], fingers:[null,1,null,2,3,null], startFret:1, desc:"萬用流行進行骨架"},
+
   {id:"Dm", name:"Dm", full:"D minor", type:"open",
-   strings:[null,null,null,2,3,1], open:[4], muted:[5,6],
-   fingers:["","","","2","3","1"], startFret:1, desc:""},
+   strings:[1,3,2,0,null,null], fingers:[1,3,2,null,null,null], startFret:1, desc:"憂鬱小調色彩"},
+
   {id:"B7", name:"B7", full:"B dominant 7", type:"open",
-   strings:[null,2,1,2,null,2], open:[3], muted:[6],
-   fingers:["","2","1","3","","4"], startFret:1, desc:"過門常用"},
+   strings:[2,0,2,1,2,null], fingers:[4,null,3,1,2,null], startFret:1, desc:"過門常用七和弦"},
+
   {id:"F",  name:"F",  full:"F major", type:"barre",
-   strings:[1,1,2,3,3,1], open:[], muted:[], barre:{fret:1,from:1,to:6},
-   fingers:["1","1","2","4","3","1"], startFret:1, desc:"初學最難的封閉和弦"},
+   strings:[1,1,2,3,3,1], barre:{fret:1,from:1,to:6}, fingers:[1,1,2,4,3,1], startFret:1, desc:"初學最難的封閉和弦"},
+
   {id:"Bm", name:"Bm", full:"B minor", type:"barre",
-   strings:[2,3,4,4,2,null], open:[], muted:[6], barre:{fret:2,from:1,to:5},
-   fingers:["1","1","3","4","2",""], startFret:2, desc:""},
-  {id:"E5", name:"E5", full:"E power", type:"power",
-   strings:[null,null,null,2,2,null], open:[6], muted:[1,2,3],
-   fingers:["","","","2","1",""], startFret:2, desc:"電吉他最基本的 power chord"},
-  {id:"A5", name:"A5", full:"A power", type:"power",
-   strings:[null,null,2,2,null,null], open:[5], muted:[1,2,6],
-   fingers:["","","2","1","",""], startFret:2, desc:""},
-  {id:"D5", name:"D5", full:"D power", type:"power",
-   strings:[null,null,null,null,3,null], open:[4], muted:[1,2,3,6],
-   fingers:["","","","","2",""], startFret:3, desc:""},
+   strings:[2,3,4,4,2,null], barre:{fret:2,from:1,to:5}, fingers:[1,2,4,3,1,null], startFret:2, desc:"二把位標準小調封閉"},
+
   {id:"Dsus2", name:"Dsus2", full:"D suspended 2", type:"open",
-   strings:[null,3,2,null,null,null], open:[1,4], muted:[5,6],
-   fingers:["","3","1","","",""], startFret:2, desc:""},
+   strings:[0,3,2,0,null,null], fingers:[null,3,1,null,null,null], startFret:1, desc:"更方便與 D 和弦互換的 3,2 指法"},
+
   {id:"Bm7", name:"Bm7", full:"B minor 7", type:"barre",
-   strings:[2,3,2,4,2,null], open:[], muted:[6], barre:{fret:2,from:1,to:5},
-   fingers:["1","2","1","4","1",""], startFret:2, desc:""},
+   strings:[2,3,2,4,2,null], barre:{fret:2,from:1,to:5}, fingers:[1,2,null,3,null,null], startFret:2, desc:"電吉他實用食指小橫按"},
+
   {id:"B", name:"B", full:"B major", type:"barre",
-   strings:[2,4,4,4,2,null], open:[], muted:[6], barre:{fret:2,from:1,to:5},
-   fingers:["1","2","3","4","1",""], startFret:2, desc:""},
+   strings:[2,4,4,4,2,null], barre:{fret:2,from:1,to:5}, fingers:[1,4,3,2,1,null], startFret:2, desc:"標準五弦根音大調封閉"},
+
   {id:"C#m7", name:"C#m7", full:"C# minor 7", type:"barre",
-   strings:[4,5,4,6,4,null], open:[], muted:[6], barre:{fret:4,from:1,to:5},
-   fingers:["1","2","1","3","1",""], startFret:4, desc:""},
+   strings:[4,5,4,6,4,null], barre:{fret:4,from:1,to:5}, fingers:[1,2,null,3,null,null], startFret:4, desc:"Love Story 轉調靈魂和弦"},
+
+  {id:"E5", name:"E5", full:"E power", type:"power",
+   strings:[null,null,null,9,7,0], fingers:[null,null,null,3,1,null], startFret:7, desc:"電吉他最基本的高把位 power chord"},
+
+  {id:"A5", name:"A5", full:"A power", type:"power",
+   strings:[null,null,2,2,0,null], fingers:[null,null,3,1,null,null], startFret:1, desc:"最威猛的 1,3 指法強力和弦體系"},
+
+  {id:"D5", name:"D5", full:"D power", type:"power",
+   strings:[null,null,7,7,5,null], fingers:[null,null,4,3,1,null], startFret:5, desc:"電吉他副歌萬用強力和弦"},
 ];
 
 /* ── Intro TAB SVG ── */
@@ -353,19 +359,16 @@ function chordSVG(ch, size=120){
     const fret=ch.strings[s];
     const x=ml+(5-s)*strW;
     if(fret===null){
-      if(ch.muted.includes(s+1))
-        svg+=`<text x="${x}" y="${mt-8}" text-anchor="middle" fill="#888" font-size="12">×</text>`;
-      else if(ch.open.includes(s+1))
-        svg+=`<circle cx="${x}" cy="${mt-9}" r="5" fill="none" stroke="#aaa" stroke-width="1.5"/>`;
+      svg+=`<text x="${x}" y="${mt-8}" text-anchor="middle" fill="#888" font-size="12">×</text>`;
+    } else if(fret===0){
+      svg+=`<circle cx="${x}" cy="${mt-9}" r="5" fill="none" stroke="#aaa" stroke-width="1.5"/>`;
     } else {
       const relFret=fret-ch.startFret+1;
       const y=mt+(relFret-.5)*fretH;
-      if(ch.open.includes(s+1))
-        svg+=`<circle cx="${x}" cy="${mt-9}" r="5" fill="none" stroke="#aaa" stroke-width="1.5"/>`;
       if(!(ch.barre && fret===ch.barre.fret)){
         svg+=`<circle cx="${x}" cy="${y}" r="${fretH*.35}" fill="#e8c97a"/>`;
         const f=ch.fingers[s];
-        if(f) svg+=`<text x="${x}" y="${y+4}" text-anchor="middle" fill="#111" font-size="${fretH*.38}" font-weight="bold">${f}</text>`;
+        if(f!=null) svg+=`<text x="${x}" y="${y+4}" text-anchor="middle" fill="#111" font-size="${fretH*.38}" font-weight="bold">${f}</text>`;
       }
     }
   }
