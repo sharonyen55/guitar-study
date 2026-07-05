@@ -214,13 +214,32 @@ const CHORDS = [
    fingers:["1","2","1","4","1",""], startFret:4, desc:""},
 ];
 
+/* ── Intro TAB SVG ── */
+function introTabSVG(){
+  const W=900,H=128,ml=28,mr=12,mt=20,ss=13,nc=32;
+  const sp=(W-ml-mr)/nc;
+  const pts=[3,2,1,0,1,2,3,2, 3,2,1,0,1,2,3,2, 4,2,1,0,1,2,3,2, 5,2,1,0,1,2,3,2];
+  const hl=new Set([0,8,16,24]);
+  const sy=i=>mt+i*ss; const nx=i=>ml+(i+.5)*sp;
+  let g=`<svg viewBox="0 0 ${W} ${H}" xmlns="http://www.w3.org/2000/svg" style="width:100%;max-width:${W}px;height:auto;display:block">`;
+  for(let i=0;i<6;i++) g+=`<line x1="${ml}" y1="${sy(i)}" x2="${W-mr}" y2="${sy(i)}" stroke="#363636" stroke-width="1"/>`;
+  for(let m=1;m<4;m++){const x=ml+m*8*sp;g+=`<line x1="${x}" y1="${mt-4}" x2="${x}" y2="${sy(5)+4}" stroke="#505050" stroke-width="1.5"/>`;}
+  const t0=sy(5)+6,t1=t0+11;
+  for(let i=0;i<nc;i+=2){const x1=nx(i),x2=nx(i+1);
+    g+=`<line x1="${x1}" y1="${t0}" x2="${x1}" y2="${t1}" stroke="#454545" stroke-width="1.2"/>`;
+    g+=`<line x1="${x2}" y1="${t0}" x2="${x2}" y2="${t1}" stroke="#454545" stroke-width="1.2"/>`;
+    g+=`<line x1="${x1}" y1="${t1}" x2="${x2}" y2="${t1}" stroke="#454545" stroke-width="2"/>`;}
+  pts.forEach((si,i)=>{const x=nx(i),y=sy(si),h=hl.has(i);
+    if(h) g+=`<ellipse cx="${x}" cy="${y}" rx="9" ry="7.5" fill="rgba(232,201,122,.18)" stroke="rgba(232,201,122,.5)" stroke-width="1.2"/>`;
+    g+=`<text x="${x}" y="${y}" text-anchor="middle" dominant-baseline="central" fill="${h?'#e8c97a':'#909090'}" font-size="10" font-family="monospace" font-weight="bold">×</text>`;});
+  return g+'</svg>';
+}
+
 /* ── Songs ── */
 const SONGS = [
   {id:1, title:"Love Story", artist:"Taylor Swift", note:"D 大調直彈，無需變調夾（CAPO 0）· 副歌後轉 E 調", sheet:[
     {type:'section', label:'前奏', strum:'分散和弦',
-     tip:'💡 右手由低音弦（④）依序撥向高音弦（①）｜左手完整按好和弦，不要悶音｜讓每個音清晰延響 Let Ring'},
-    {chords:['Dsus2','A'], lyrics:''},
-    {chords:['Bm7','G'], lyrics:''},
+     tip:'💡 分散和弦 ④→③→②→①：右手由低音弦（④）依序撥向高音弦（①）｜左手完整按好和弦，不要悶音｜讓每個音清晰延響 Let Ring'},
 
     {type:'section', label:'主歌 A'},
     {chords:['Dsus2'], lyrics:`We were both young when I first saw you`},
@@ -522,7 +541,7 @@ function renderTabSheet(sheet){
         ${block.strum?`<span style="margin-left:10px;font-size:.88rem;color:#e8c97a;letter-spacing:.05em;font-family:monospace">${block.strum}</span>`:''}
       </div>
       ${block.tip?`<div style="margin-top:6px;font-size:.82rem;color:#777;line-height:1.7;padding:6px 12px;border-left:2px solid #2a2a2a">${block.tip}</div>`:''}
-      ${block.tab?`<pre style="margin-top:10px;font-family:'Courier New',monospace;font-size:.85rem;color:#aaa;line-height:1.9;overflow-x:auto;padding:10px 14px;background:#111;border-radius:6px;border:1px solid #222">${block.tab}</pre>`:''}
+      ${block.tab?(block.tab.trimStart().startsWith('<svg')?`<div style="margin-top:12px;overflow-x:auto">${block.tab}</div>`:`<pre style="margin-top:10px;font-family:'Courier New',monospace;font-size:.85rem;color:#aaa;line-height:1.9;overflow-x:auto;padding:10px 14px;background:#111;border-radius:6px;border:1px solid #222">${block.tab}</pre>`):''}
     </div>`;
     const chords=block.chords||[];
     const lyrics=block.lyrics||'';
@@ -549,7 +568,7 @@ function renderSheet(sheet){
         ${block.strum?`<span style="margin-left:10px;font-size:.88rem;color:#e8c97a;letter-spacing:.05em;font-family:monospace">${block.strum}</span>`:''}
       </div>
       ${block.tip?`<div style="margin-top:6px;font-size:.82rem;color:#777;line-height:1.7;padding:6px 12px;border-left:2px solid #2a2a2a">${block.tip}</div>`:''}
-      ${block.tab?`<pre style="margin-top:10px;font-family:'Courier New',monospace;font-size:.85rem;color:#aaa;line-height:1.9;overflow-x:auto;padding:10px 14px;background:#111;border-radius:6px;border:1px solid #222">${block.tab}</pre>`:''}
+      ${block.tab?(block.tab.trimStart().startsWith('<svg')?`<div style="margin-top:12px;overflow-x:auto">${block.tab}</div>`:`<pre style="margin-top:10px;font-family:'Courier New',monospace;font-size:.85rem;color:#aaa;line-height:1.9;overflow-x:auto;padding:10px 14px;background:#111;border-radius:6px;border:1px solid #222">${block.tab}</pre>`):''}
     </div>`;
     const chords=block.chords||[];
     const lyrics=block.lyrics||'';
@@ -576,6 +595,7 @@ function closePopup(){ document.getElementById('chord-popup').classList.remove('
 document.addEventListener('click', closePopup);
 
 /* ── Init ── */
+SONGS[0].sheet[0].tab = introTabSVG();
 switchTab('songs');
 </script>
 </body>
