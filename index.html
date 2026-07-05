@@ -10,20 +10,34 @@
 body{background:#0f0f0f;color:#e0e0e0;font-family:'Segoe UI',sans-serif;min-height:100vh;display:flex}
 
 /* ── Sidebar ── */
-#sidebar{width:220px;min-height:100vh;background:#141414;border-right:1px solid #222;display:flex;flex-direction:column;flex-shrink:0}
-.sidebar-brand{padding:22px 18px 16px}
-.sidebar-brand-title{font-size:1rem;font-weight:700;color:#e8c97a;display:flex;align-items:center;gap:8px}
-.sidebar-brand-sub{font-size:.75rem;color:#666;margin-top:4px}
-.sidebar-divider{height:1px;background:#222;margin:0 18px 12px}
-.sidebar-stat{padding:10px 18px 14px}
+#sidebar{width:220px;min-width:220px;min-height:100vh;background:#141414;border-right:1px solid #222;display:flex;flex-direction:column;flex-shrink:0;transition:width .25s,min-width .25s;overflow:hidden}
+#sidebar.collapsed{width:40px;min-width:40px}
+#sb-content{display:flex;flex-direction:column;flex:1;overflow:hidden}
+#sidebar.collapsed #sb-content{display:none}
+#sidebar.collapsed #sb-toggle-icon{transform:rotate(180deg)}
+#sb-head{padding:14px 14px 12px;border-bottom:1px solid #222;display:flex;align-items:center;gap:8px;cursor:pointer;flex-shrink:0}
+#sb-brand{flex:1;min-width:0}
+.sidebar-brand-title{font-size:1rem;font-weight:700;color:#e8c97a}
+.sidebar-brand-sub{font-size:.75rem;color:#666;margin-top:3px}
+#sb-toggle{width:26px;height:26px;border-radius:6px;border:1px solid #2a2a2a;background:transparent;color:#666;cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:background .15s,color .15s}
+#sb-toggle:hover{background:#222;color:#ccc}
+#sb-toggle-icon{font-size:10px;transition:transform .25s;display:inline-block}
+.sidebar-divider{height:1px;background:#222;margin:0 14px 8px}
+.sidebar-stat{padding:10px 16px 12px}
 .sidebar-stat-label{font-size:11px;color:#666;display:flex;justify-content:space-between;margin-bottom:4px}
 .sidebar-prog{height:4px;background:#222;border-radius:2px;overflow:hidden}
 .sidebar-prog-fill{height:100%;border-radius:2px;background:#e8c97a;transition:width .4s}
-.sidebar-nav{padding:0 10px;flex:1}
+.sidebar-nav{padding:0 8px 8px}
 .nav-item{display:flex;align-items:center;gap:10px;padding:9px 10px;border-radius:8px;cursor:pointer;color:#888;font-size:.88rem;transition:all .2s;margin-bottom:2px;border:none;background:transparent;width:100%;text-align:left}
 .nav-item:hover{background:#1e1e1e;color:#ccc}
 .nav-item.active{background:#2a1e00;color:#e8c97a}
 .nav-icon{font-size:1rem;width:20px;text-align:center}
+/* song list in sidebar */
+#song-list{overflow-y:auto;flex:1;padding:4px 0;border-top:1px solid #222}
+.s-item{padding:9px 14px;cursor:pointer;border-left:3px solid transparent;font-size:.85rem;color:#888;transition:background .15s,border-color .15s,color .15s;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.s-item:hover{background:#1e1e1e;color:#ccc}
+.s-item.active{background:#2a1e00;border-left-color:#e8c97a;color:#e8c97a}
+.s-item-artist{font-size:.72rem;color:#555;margin-top:2px}
 
 /* ── Content ── */
 #content{flex:1;padding:28px 32px;overflow-y:auto;max-width:900px}
@@ -88,20 +102,27 @@ body{background:#0f0f0f;color:#e0e0e0;font-family:'Segoe UI',sans-serif;min-heig
 
 <!-- Sidebar -->
 <nav id="sidebar">
-  <div class="sidebar-brand" style="cursor:pointer" onclick="switchTab('home')">
-    <div class="sidebar-brand-title">🎸 吉他學習筆記</div>
-    <div class="sidebar-brand-sub">Electric Guitar</div>
+  <div id="sb-head" onclick="switchTab('home')">
+    <div id="sb-brand">
+      <div class="sidebar-brand-title">🎸 吉他學習筆記</div>
+      <div class="sidebar-brand-sub">Electric Guitar</div>
+    </div>
+    <button id="sb-toggle" onclick="event.stopPropagation();toggleSidebar()" title="收起側欄">
+      <span id="sb-toggle-icon">◀</span>
+    </button>
   </div>
-  <div class="sidebar-divider"></div>
-  <div class="sidebar-stat" id="sidebar-stat"></div>
-  <div class="sidebar-divider"></div>
-  <div class="sidebar-nav">
-    <button class="nav-item" id="nav-chord" onclick="switchTab('chord')">
-      <span class="nav-icon">🎵</span>和弦記憶
-    </button>
-    <button class="nav-item" id="nav-song" id="nav-song-btn" onclick="switchTab('songs')">
-      <span class="nav-icon">📄</span>歌譜
-    </button>
+  <div id="sb-content">
+    <div class="sidebar-stat" id="sidebar-stat"></div>
+    <div class="sidebar-divider"></div>
+    <div class="sidebar-nav">
+      <button class="nav-item" id="nav-chord" onclick="switchTab('chord')">
+        <span class="nav-icon">🎵</span>和弦記憶
+      </button>
+      <button class="nav-item" id="nav-songs" onclick="switchTab('songs')">
+        <span class="nav-icon">📄</span>歌譜
+      </button>
+    </div>
+    <div id="song-list" style="display:none"></div>
   </div>
 </nav>
 
@@ -315,6 +336,11 @@ function chordSVG(ch, size=120){
   return svg+'</svg>';
 }
 
+/* ── Sidebar toggle ── */
+function toggleSidebar(){
+  document.getElementById('sidebar').classList.toggle('collapsed');
+}
+
 /* ── Tab switching ── */
 function switchTab(t){
   curTab=t;
@@ -324,9 +350,10 @@ function switchTab(t){
   document.getElementById('home-view').style.display  = t==='home'   ? 'block' : 'none';
   document.getElementById('chord-view').style.display = t==='chord'  ? 'block' : 'none';
   document.getElementById('song-view').style.display  = t==='songs'  ? 'block' : 'none';
-  if(t==='home')  renderHome();
+  document.getElementById('song-list').style.display  = t==='songs'  ? 'block' : 'none';
+  if(t==='home')  { curSong=null; renderHome(); }
   if(t==='chord') renderChords();
-  if(t==='songs') renderSongs();
+  if(t==='songs') renderSongList();
   renderSidebar();
 }
 
@@ -422,31 +449,33 @@ function setFilter(t){ chordFilter=t; renderChords(); }
 
 /* ── Songs view ── */
 let curSong=null;
+function renderSongList(){
+  const el=document.getElementById('song-list');
+  if(!SONGS.length){ el.innerHTML='<div style="padding:12px 14px;font-size:.8rem;color:#555">尚未新增歌曲</div>'; return; }
+  el.innerHTML=SONGS.map(s=>`
+    <div class="s-item${curSong===s.id?' active':''}" onclick="openSong(${s.id})">
+      <div>${s.title}</div>
+      <div class="s-item-artist">${s.artist||''}</div>
+    </div>`).join('');
+}
 function renderSongs(){
-  if(curSong){ openSong(curSong); return; }
-  if(!SONGS.length){
+  if(!curSong){
     document.getElementById('song-view').innerHTML=`
       <div class="home-title">歌譜</div>
-      <div style="color:#666;font-size:.9rem">老師教的歌之後在這裡新增</div>`;
-    return;
+      <div style="color:#666;font-size:.9rem">${SONGS.length?'從左側選擇歌曲':'老師教的歌之後在這裡新增'}</div>`;
+  } else {
+    openSong(curSong);
   }
-  document.getElementById('song-view').innerHTML=`
-    <div class="home-title">歌譜</div>
-    <div class="song-cards">${SONGS.map(s=>`
-      <div class="song-card" onclick="openSong(${s.id})">
-        <div class="song-card-title">${s.title}</div>
-        <div class="song-card-meta">${s.artist||''}</div>
-      </div>`).join('')}</div>`;
 }
 function openSong(id){
   curSong=id;
   const s=SONGS.find(x=>x.id===id);
   if(!s) return;
+  renderSongList();
   document.getElementById('song-view').innerHTML=`
-    <button class="back-btn" onclick="curSong=null;renderSongs()">← 歌譜列表</button>
-    <div class="song-header">
+    <div class="song-header" style="margin-bottom:20px">
       <div class="song-title-lg">${s.title}</div>
-      <div class="song-artist-sm">${s.artist||''}</div>
+      <div class="song-artist-sm">${s.artist||''}${s.note?` · ${s.note}`:''}</div>
     </div>
     <div class="sheet">${renderSheet(s.sheet)}</div>`;
 }
