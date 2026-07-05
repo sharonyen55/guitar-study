@@ -202,7 +202,7 @@ const CHORDS = [
    fingers:["","","","","2",""], startFret:3, desc:""},
   {id:"Dsus2", name:"Dsus2", full:"D suspended 2", type:"open",
    strings:[null,3,2,null,null,null], open:[1,4], muted:[5,6],
-   fingers:["","3","2","","",""], startFret:2, desc:""},
+   fingers:["","3","1","","",""], startFret:2, desc:""},
   {id:"Bm7", name:"Bm7", full:"B minor 7", type:"open",
    strings:[2,3,2,null,2,null], open:[4], muted:[6],
    fingers:["2","3","1","","2",""], startFret:2, desc:""},
@@ -218,14 +218,8 @@ const CHORDS = [
 const SONGS = [
   {id:1, title:"Love Story", artist:"Taylor Swift", note:"D 大調直彈，無需變調夾（CAPO 0）· 副歌後轉 E 調", sheet:[
     {type:'section', label:'前奏', strum:'分散和弦　④→③→②→①',
-     tip:'💡 右手由低音弦（④）依序撥向高音弦（①）｜左手完整按好和弦，不要悶音｜讓每個音清晰延響 Let Ring',
-     tab:`前奏指法 (分散和弦，請保持 Let Ring 延音)
-e |-------X-------X---------------X-------X---------|
-B |-----X---X---X---X-----------X---X---X---X-------|
-G |---X-------X-------X-------X-------X-------X-----|
-D |-X-----------------------X-----------------------|
-A |-------------------------|
-E |                         |`},
+     tip:'💡 右手由低音弦（④）依序撥向高音弦（①）｜左手完整按好和弦，不要悶音｜讓每個音清晰延響 Let Ring'},
+    {chords:['Dsus2'], lyrics:''},
 
     {type:'section', label:'主歌 A'},
     {chords:['Dsus2'], lyrics:`We were both young when I first saw you`},
