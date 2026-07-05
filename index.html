@@ -33,11 +33,17 @@ body{background:#0f0f0f;color:#e0e0e0;font-family:'Segoe UI',sans-serif;min-heig
 .nav-item.active{background:#2a1e00;color:#e8c97a}
 .nav-icon{font-size:1rem;width:20px;text-align:center}
 /* song list in sidebar */
-#song-list{overflow-y:auto;flex:1;padding:4px 0;border-top:1px solid #222}
-.s-item{padding:9px 14px;cursor:pointer;border-left:3px solid transparent;font-size:.85rem;color:#888;transition:background .15s,border-color .15s,color .15s;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+#song-list{overflow-y:auto;flex:1;border-top:1px solid #222}
+.artist-hd{padding:9px 14px;cursor:pointer;display:flex;align-items:center;gap:7px;font-size:11px;font-weight:700;color:#666;letter-spacing:.5px;text-transform:uppercase;user-select:none;transition:background .15s;border-bottom:1px solid #1e1e1e}
+.artist-hd:hover{background:#1a1a1a;color:#aaa}
+.artist-hd.open{color:#e8c97a}
+.artist-arrow{font-size:8px;transition:transform .2s;display:inline-block;flex-shrink:0}
+.artist-hd.open .artist-arrow{transform:rotate(90deg)}
+.artist-songs{overflow:hidden}
+.artist-songs.closed{display:none}
+.s-item{padding:7px 12px 7px 28px;cursor:pointer;border-left:3px solid transparent;font-size:.84rem;color:#888;transition:background .15s,border-color .15s,color .15s;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .s-item:hover{background:#1e1e1e;color:#ccc}
 .s-item.active{background:#2a1e00;border-left-color:#e8c97a;color:#e8c97a}
-.s-item-artist{font-size:.72rem;color:#555;margin-top:2px}
 
 /* ── Content ── */
 #content{flex:1;padding:28px 32px;overflow-y:auto;max-width:900px}
@@ -449,14 +455,28 @@ function setFilter(t){ chordFilter=t; renderChords(); }
 
 /* ── Songs view ── */
 let curSong=null;
+let openArtists=new Set(SONGS.map(s=>s.artist||''));
+function toggleArtist(artist){
+  if(openArtists.has(artist)) openArtists.delete(artist);
+  else openArtists.add(artist);
+  renderSongList();
+}
 function renderSongList(){
   const el=document.getElementById('song-list');
   if(!SONGS.length){ el.innerHTML='<div style="padding:12px 14px;font-size:.8rem;color:#555">尚未新增歌曲</div>'; return; }
-  el.innerHTML=SONGS.map(s=>`
-    <div class="s-item${curSong===s.id?' active':''}" onclick="openSong(${s.id})">
-      <div>${s.title}</div>
-      <div class="s-item-artist">${s.artist||''}</div>
-    </div>`).join('');
+  const groups={};
+  SONGS.forEach(s=>{ const a=s.artist||'未分類'; (groups[a]=groups[a]||[]).push(s); });
+  el.innerHTML=Object.entries(groups).map(([artist,songs])=>{
+    const isOpen=openArtists.has(artist);
+    return `<div class="artist-group">
+      <div class="artist-hd${isOpen?' open':''}" onclick="toggleArtist('${artist.replace(/'/g,"\\'")}')">
+        <span class="artist-arrow">▶</span>${artist}
+      </div>
+      <div class="artist-songs${isOpen?'':' closed'}">
+        ${songs.map(s=>`<div class="s-item${curSong===s.id?' active':''}" onclick="openSong(${s.id})">${s.title}</div>`).join('')}
+      </div>
+    </div>`;
+  }).join('');
 }
 function renderSongs(){
   if(!curSong){
