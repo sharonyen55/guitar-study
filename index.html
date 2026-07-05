@@ -1,0 +1,398 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>吉他學習筆記</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:#0f0f0f;color:#e0e0e0;font-family:'Segoe UI',sans-serif;min-height:100vh;display:flex}
+
+/* ── Sidebar ── */
+#sidebar{width:220px;min-height:100vh;background:#141414;border-right:1px solid #222;display:flex;flex-direction:column;flex-shrink:0}
+.sidebar-brand{padding:22px 18px 16px}
+.sidebar-brand-title{font-size:1rem;font-weight:700;color:#e8c97a;display:flex;align-items:center;gap:8px}
+.sidebar-brand-sub{font-size:.75rem;color:#666;margin-top:4px}
+.sidebar-divider{height:1px;background:#222;margin:0 18px 12px}
+.sidebar-stat{padding:10px 18px 14px}
+.sidebar-stat-label{font-size:11px;color:#666;display:flex;justify-content:space-between;margin-bottom:4px}
+.sidebar-prog{height:4px;background:#222;border-radius:2px;overflow:hidden}
+.sidebar-prog-fill{height:100%;border-radius:2px;background:#e8c97a;transition:width .4s}
+.sidebar-nav{padding:0 10px;flex:1}
+.nav-item{display:flex;align-items:center;gap:10px;padding:9px 10px;border-radius:8px;cursor:pointer;color:#888;font-size:.88rem;transition:all .2s;margin-bottom:2px;border:none;background:transparent;width:100%;text-align:left}
+.nav-item:hover{background:#1e1e1e;color:#ccc}
+.nav-item.active{background:#2a1e00;color:#e8c97a}
+.nav-icon{font-size:1rem;width:20px;text-align:center}
+
+/* ── Content ── */
+#content{flex:1;padding:28px 32px;overflow-y:auto;max-width:900px}
+
+/* ── Home ── */
+.home-title{font-size:1.3rem;font-weight:700;color:#e8c97a;margin-bottom:20px}
+.stats-row{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:28px}
+.stat-card{background:#1a1a1a;border:1px solid #2a2a2a;border-radius:10px;padding:16px 20px}
+.stat-label{font-size:.75rem;color:#888;margin-bottom:4px}
+.stat-val{font-size:1.8rem;font-weight:700;color:#e8c97a}
+.stat-sub{font-size:.75rem;color:#666;margin-top:2px}
+.prog-bar{height:6px;background:#2a2a2a;border-radius:3px;margin-top:8px;overflow:hidden}
+.prog-fill{height:100%;border-radius:3px;background:#e8c97a;transition:width .4s}
+.section-title{font-size:.8rem;color:#666;font-weight:600;margin-bottom:12px;text-transform:uppercase;letter-spacing:.06em}
+.song-cards{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:10px;margin-bottom:28px}
+.song-card{background:#1a1a1a;border:1px solid #2a2a2a;border-radius:10px;padding:14px;cursor:pointer;transition:border-color .2s}
+.song-card:hover{border-color:#e8c97a}
+.song-card-title{font-size:.95rem;font-weight:600;margin-bottom:4px}
+.song-card-meta{font-size:.75rem;color:#888}
+
+/* ── Chord view ── */
+#chord-view{display:none}
+#chord-view.show{display:block}
+.chord-filters{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:16px}
+.chord-filter-btn{padding:5px 14px;border:1px solid #333;border-radius:20px;background:transparent;color:#aaa;cursor:pointer;font-size:.8rem;transition:all .2s}
+.chord-filter-btn.active{border-color:#e8c97a;color:#e8c97a;background:#2a1a00}
+.chord-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:12px}
+.c-card{perspective:600px;height:200px;cursor:pointer}
+.c-inner{position:relative;width:100%;height:100%;transform-style:preserve-3d;transition:transform .45s}
+.c-card.flipped .c-inner{transform:rotateY(180deg)}
+.c-face,.c-back{position:absolute;inset:0;backface-visibility:hidden;border-radius:12px;border:1px solid #2a2a2a;display:flex;flex-direction:column;align-items:center;justify-content:center;background:#1a1a1a;padding:12px}
+.c-back{transform:rotateY(180deg);justify-content:space-between}
+.c-name{font-size:1.6rem;font-weight:700;color:#e8c97a}
+.c-type{font-size:.75rem;color:#888;margin-top:4px}
+.c-learned-tag{font-size:.7rem;color:#4caf7d;margin-top:8px}
+.c-diagram{flex:1;display:flex;align-items:center;justify-content:center;width:100%}
+.c-chk-btn{margin-top:8px;padding:5px 14px;border:none;border-radius:6px;font-size:.75rem;cursor:pointer;background:#2a3a2a;color:#4caf7d;transition:background .2s}
+.c-chk-btn.done{background:#1a2a1a}
+
+/* ── Song view ── */
+#song-view{display:none}
+#song-view.show{display:block}
+.back-btn{padding:6px 14px;background:#2a2a2a;border:none;border-radius:6px;color:#aaa;cursor:pointer;font-size:.8rem;margin-bottom:16px}
+.back-btn:hover{color:#e8c97a}
+.song-header{margin-bottom:20px}
+.song-title-lg{font-size:1.4rem;font-weight:700;color:#e8c97a}
+.song-artist-sm{font-size:.85rem;color:#888;margin-top:2px}
+.sheet{line-height:2;font-size:.95rem}
+.sheet-line{margin-bottom:4px}
+.chord-row{height:1.4em;color:#e8c97a;font-size:.82rem;font-weight:600;letter-spacing:.03em}
+.lyrics-row{color:#e0e0e0}
+.inline-chord{display:inline-block;margin-right:4px;cursor:pointer;text-decoration:underline dotted}
+.inline-chord:hover{color:#fff}
+
+/* chord popup */
+.chord-popup{position:fixed;background:#222;border:1px solid #444;border-radius:12px;padding:14px;z-index:100;display:none;flex-direction:column;align-items:center;gap:8px;box-shadow:0 8px 32px #0008}
+.chord-popup.show{display:flex}
+.chord-popup-name{font-size:1rem;font-weight:700;color:#e8c97a}
+</style>
+</head>
+<body>
+
+<!-- Sidebar -->
+<nav id="sidebar">
+  <div class="sidebar-brand" style="cursor:pointer" onclick="switchTab('home')">
+    <div class="sidebar-brand-title">🎸 吉他學習筆記</div>
+    <div class="sidebar-brand-sub">Electric Guitar</div>
+  </div>
+  <div class="sidebar-divider"></div>
+  <div class="sidebar-stat" id="sidebar-stat"></div>
+  <div class="sidebar-divider"></div>
+  <div class="sidebar-nav">
+    <button class="nav-item" id="nav-chord" onclick="switchTab('chord')">
+      <span class="nav-icon">🎵</span>和弦記憶
+    </button>
+    <button class="nav-item" id="nav-song" id="nav-song-btn" onclick="switchTab('songs')">
+      <span class="nav-icon">📄</span>歌譜
+    </button>
+  </div>
+</nav>
+
+<!-- Content -->
+<div id="content">
+  <div id="home-view"></div>
+  <div id="chord-view"></div>
+  <div id="song-view"></div>
+</div>
+
+<!-- Chord popup -->
+<div class="chord-popup" id="chord-popup" onclick="closePopup()">
+  <div class="chord-popup-name" id="popup-name"></div>
+  <div id="popup-diagram"></div>
+</div>
+
+<script>
+const LKEY = 'guitar_v1';
+
+/* ── Chord data ── */
+const CHORDS = [
+  {id:"Em", name:"Em", full:"E minor", type:"open",
+   strings:[null,null,2,2,null,null], open:[1,2,5,6], muted:[],
+   fingers:["","","2","1","",""], startFret:1, desc:"最常見的入門和弦"},
+  {id:"Am", name:"Am", full:"A minor", type:"open",
+   strings:[null,null,2,2,1,null], open:[1,6], muted:[6],
+   fingers:["","","3","2","1",""], startFret:1, desc:"民謠必備，轉位簡單"},
+  {id:"E",  name:"E",  full:"E major", type:"open",
+   strings:[null,null,1,2,2,null], open:[1,2,6], muted:[],
+   fingers:["","","1","3","2",""], startFret:1, desc:""},
+  {id:"A",  name:"A",  full:"A major", type:"open",
+   strings:[null,null,2,2,2,null], open:[1,5], muted:[6],
+   fingers:["","","1","2","3",""], startFret:2, desc:""},
+  {id:"D",  name:"D",  full:"D major", type:"open",
+   strings:[null,null,null,2,3,2], open:[4], muted:[5,6],
+   fingers:["","","","1","3","2"], startFret:2, desc:""},
+  {id:"G",  name:"G",  full:"G major", type:"open",
+   strings:[3,2,null,null,3,null], open:[2,3,4], muted:[],
+   fingers:["3","1","","","4",""], startFret:2, desc:"手指跨度較大，多練習"},
+  {id:"C",  name:"C",  full:"C major", type:"open",
+   strings:[null,3,2,null,1,null], open:[1,3,5], muted:[6],
+   fingers:["","3","2","","1",""], startFret:1, desc:""},
+  {id:"Dm", name:"Dm", full:"D minor", type:"open",
+   strings:[null,null,null,2,3,1], open:[4], muted:[5,6],
+   fingers:["","","","2","3","1"], startFret:1, desc:""},
+  {id:"B7", name:"B7", full:"B dominant 7", type:"open",
+   strings:[null,2,1,2,null,2], open:[3], muted:[6],
+   fingers:["","2","1","3","","4"], startFret:1, desc:"過門常用"},
+  {id:"F",  name:"F",  full:"F major", type:"barre",
+   strings:[1,1,2,3,3,1], open:[], muted:[], barre:{fret:1,from:1,to:6},
+   fingers:["1","1","2","4","3","1"], startFret:1, desc:"初學最難的封閉和弦"},
+  {id:"Bm", name:"Bm", full:"B minor", type:"barre",
+   strings:[2,3,4,4,2,null], open:[], muted:[6], barre:{fret:2,from:1,to:5},
+   fingers:["1","1","3","4","2",""], startFret:2, desc:""},
+  {id:"E5", name:"E5", full:"E power", type:"power",
+   strings:[null,null,null,2,2,null], open:[6], muted:[1,2,3],
+   fingers:["","","","2","1",""], startFret:2, desc:"電吉他最基本的 power chord"},
+  {id:"A5", name:"A5", full:"A power", type:"power",
+   strings:[null,null,2,2,null,null], open:[5], muted:[1,2,6],
+   fingers:["","","2","1","",""], startFret:2, desc:""},
+  {id:"D5", name:"D5", full:"D power", type:"power",
+   strings:[null,null,null,null,3,null], open:[4], muted:[1,2,3,6],
+   fingers:["","","","","2",""], startFret:3, desc:""},
+];
+
+/* ── Songs ── */
+const SONGS = [];
+
+/* ── State ── */
+let learned = JSON.parse(localStorage.getItem(LKEY) || '{}');
+let chordFilter = 'all';
+let curTab = 'home';
+
+function save(){ localStorage.setItem(LKEY, JSON.stringify(learned)); }
+function isLearned(id){ return !!learned['c_'+id]; }
+function toggleLearned(id){
+  if(learned['c_'+id]) delete learned['c_'+id]; else learned['c_'+id]=true;
+  save();
+}
+
+/* ── SVG chord diagram ── */
+function chordSVG(ch, size=120){
+  const sw=size, sh=size+20;
+  const ml=24,mr=10,mt=24,mb=10;
+  const fw=sw-ml-mr, fh=sh-mt-mb;
+  const strW=fw/5, fretH=fh/4;
+  const nFrets=4;
+  let svg=`<svg width="${sw}" height="${sh}" xmlns="http://www.w3.org/2000/svg">`;
+  for(let f=0;f<=nFrets;f++){
+    const y=mt+f*fretH;
+    svg+=`<line x1="${ml}" y1="${y}" x2="${ml+fw}" y2="${y}" stroke="#aaa" stroke-width="${f===0?2.5:1}"/>`;
+  }
+  for(let s=0;s<6;s++){
+    const x=ml+s*strW;
+    svg+=`<line x1="${x}" y1="${mt}" x2="${x}" y2="${mt+fh}" stroke="#aaa" stroke-width="1"/>`;
+  }
+  if(ch.barre){
+    const relFret=ch.barre.fret-ch.startFret+1;
+    const y=mt+(relFret-.5)*fretH;
+    const x1=ml+(6-ch.barre.to)*strW;
+    const x2=ml+(6-ch.barre.from)*strW;
+    svg+=`<rect x="${x1-5}" y="${y-6}" width="${x2-x1+10}" height="12" rx="6" fill="#e8c97a"/>`;
+  }
+  for(let s=0;s<6;s++){
+    const fret=ch.strings[s];
+    const x=ml+(5-s)*strW;
+    if(fret===null){
+      if(ch.muted.includes(s+1))
+        svg+=`<text x="${x}" y="${mt-8}" text-anchor="middle" fill="#888" font-size="12">×</text>`;
+      else if(ch.open.includes(s+1))
+        svg+=`<circle cx="${x}" cy="${mt-9}" r="5" fill="none" stroke="#aaa" stroke-width="1.5"/>`;
+    } else {
+      const relFret=fret-ch.startFret+1;
+      const y=mt+(relFret-.5)*fretH;
+      if(ch.open.includes(s+1))
+        svg+=`<circle cx="${x}" cy="${mt-9}" r="5" fill="none" stroke="#aaa" stroke-width="1.5"/>`;
+      if(!(ch.barre && fret===ch.barre.fret)){
+        svg+=`<circle cx="${x}" cy="${y}" r="${fretH*.35}" fill="#e8c97a"/>`;
+        const f=ch.fingers[s];
+        if(f) svg+=`<text x="${x}" y="${y+4}" text-anchor="middle" fill="#111" font-size="${fretH*.38}" font-weight="bold">${f}</text>`;
+      }
+    }
+  }
+  if(ch.startFret>1)
+    svg+=`<text x="${ml+fw+6}" y="${mt+fretH*.6}" fill="#888" font-size="11">${ch.startFret}fr</text>`;
+  return svg+'</svg>';
+}
+
+/* ── Tab switching ── */
+function switchTab(t){
+  curTab=t;
+  ['chord','songs'].forEach(id=>{
+    document.getElementById('nav-'+id)?.classList.toggle('active', id===t);
+  });
+  document.getElementById('home-view').style.display  = t==='home'   ? '' : 'none';
+  document.getElementById('chord-view').style.display = t==='chord'  ? '' : 'none';
+  document.getElementById('song-view').style.display  = t==='songs'  ? '' : 'none';
+  if(t==='home')  renderHome();
+  if(t==='chord') renderChords();
+  if(t==='songs') renderSongs();
+  renderSidebar();
+}
+
+/* ── Sidebar stat ── */
+function renderSidebar(){
+  const total=CHORDS.length;
+  const done=CHORDS.filter(c=>isLearned(c.id)).length;
+  const pct=total?Math.round(done/total*100):0;
+  document.getElementById('sidebar-stat').innerHTML=`
+    <div class="sidebar-stat-label"><span>和弦進度</span><span>${done} / ${total}</span></div>
+    <div class="sidebar-prog"><div class="sidebar-prog-fill" style="width:${pct}%"></div></div>
+  `;
+}
+
+/* ── Home ── */
+function renderHome(){
+  const total=CHORDS.length;
+  const done=CHORDS.filter(c=>isLearned(c.id)).length;
+  const pct=total?Math.round(done/total*100):0;
+  const typeLabel={open:'開放和弦',power:'Power Chord',barre:'封閉和弦'};
+  const typeBars=['open','power','barre'].map(tp=>{
+    const tc=CHORDS.filter(c=>c.type===tp);
+    const td=tc.filter(c=>isLearned(c.id)).length;
+    const p=tc.length?Math.round(td/tc.length*100):0;
+    return `<div style="margin-bottom:14px">
+      <div style="display:flex;justify-content:space-between;font-size:.8rem;margin-bottom:5px">
+        <span style="color:#ccc">${typeLabel[tp]}</span>
+        <span style="color:#888">${td} / ${tc.length}</span>
+      </div>
+      <div class="prog-bar"><div class="prog-fill" style="width:${p}%"></div></div>
+    </div>`;
+  }).join('');
+  document.getElementById('home-view').innerHTML=`
+    <div class="home-title">學習總覽</div>
+    <div class="stats-row">
+      <div class="stat-card">
+        <div class="stat-label">已記住和弦</div>
+        <div class="stat-val">${done} <span style="font-size:1rem;color:#888">/ ${total}</span></div>
+        <div class="prog-bar" style="margin-top:10px"><div class="prog-fill" style="width:${pct}%"></div></div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-label">收錄歌曲</div>
+        <div class="stat-val">${SONGS.length}</div>
+        <div class="stat-sub">老師教的歌</div>
+      </div>
+    </div>
+    <div class="section-title">各類和弦進度</div>
+    ${typeBars}
+    ${SONGS.length ? `<div class="section-title" style="margin-top:24px">歌曲清單</div>
+    <div class="song-cards">${SONGS.map(s=>`
+      <div class="song-card" onclick="switchTab('songs');openSong(${s.id})">
+        <div class="song-card-title">${s.title}</div>
+        <div class="song-card-meta">${s.artist||''}</div>
+      </div>`).join('')}</div>` : ''}
+  `;
+}
+
+/* ── Chord view ── */
+function renderChords(){
+  const types=['all','open','power','barre'];
+  const typeLabel={all:'全部',open:'開放',power:'Power',barre:'封閉'};
+  const filtered=CHORDS.filter(c=>chordFilter==='all'||c.type===chordFilter);
+  document.getElementById('chord-view').innerHTML=`
+    <div class="home-title">和弦記憶</div>
+    <div class="chord-filters">
+      ${types.map(t=>`<button class="chord-filter-btn${chordFilter===t?' active':''}" onclick="setFilter('${t}')">${typeLabel[t]}</button>`).join('')}
+    </div>
+    <div class="chord-grid">
+      ${filtered.map(c=>`
+        <div class="c-card${isLearned(c.id)?' flipped':''}" id="cc-${c.id}" onclick="flipChord('${c.id}')">
+          <div class="c-inner">
+            <div class="c-face">
+              <div class="c-name">${c.name}</div>
+              <div class="c-type">${c.full}</div>
+              ${isLearned(c.id)?'<div class="c-learned-tag">✓ 已記住</div>':''}
+              ${c.desc?`<div style="font-size:.72rem;color:#666;margin-top:8px;text-align:center">${c.desc}</div>`:''}
+            </div>
+            <div class="c-back">
+              <div class="c-diagram">${chordSVG(c,130)}</div>
+              <button class="c-chk-btn${isLearned(c.id)?' done':''}" onclick="markChord(event,'${c.id}')">
+                ${isLearned(c.id)?'✓ 已記住':'標記記住'}
+              </button>
+            </div>
+          </div>
+        </div>`).join('')}
+    </div>
+  `;
+}
+
+function flipChord(id){ document.getElementById('cc-'+id).classList.toggle('flipped'); }
+function markChord(e,id){ e.stopPropagation(); toggleLearned(id); renderChords(); renderSidebar(); }
+function setFilter(t){ chordFilter=t; renderChords(); }
+
+/* ── Songs view ── */
+let curSong=null;
+function renderSongs(){
+  if(curSong){ openSong(curSong); return; }
+  if(!SONGS.length){
+    document.getElementById('song-view').innerHTML=`
+      <div class="home-title">歌譜</div>
+      <div style="color:#666;font-size:.9rem">老師教的歌之後在這裡新增</div>`;
+    return;
+  }
+  document.getElementById('song-view').innerHTML=`
+    <div class="home-title">歌譜</div>
+    <div class="song-cards">${SONGS.map(s=>`
+      <div class="song-card" onclick="openSong(${s.id})">
+        <div class="song-card-title">${s.title}</div>
+        <div class="song-card-meta">${s.artist||''}</div>
+      </div>`).join('')}</div>`;
+}
+function openSong(id){
+  curSong=id;
+  const s=SONGS.find(x=>x.id===id);
+  if(!s) return;
+  document.getElementById('song-view').innerHTML=`
+    <button class="back-btn" onclick="curSong=null;renderSongs()">← 歌譜列表</button>
+    <div class="song-header">
+      <div class="song-title-lg">${s.title}</div>
+      <div class="song-artist-sm">${s.artist||''}</div>
+    </div>
+    <div class="sheet">${renderSheet(s.sheet)}</div>`;
+}
+function renderSheet(sheet){
+  return (sheet||[]).map(block=>{
+    if(block.type==='section') return `<div style="color:#888;font-size:.8rem;margin:16px 0 4px;text-transform:uppercase">${block.label}</div>`;
+    const chords=block.chords||[];
+    const lyrics=block.lyrics||'';
+    return `<div class="sheet-line">
+      <div class="chord-row">${chords.map(c=>`<span class="inline-chord" onclick="showPopup('${c}',event)">${c}</span>`).join(' ')}</div>
+      <div class="lyrics-row">${lyrics}</div>
+    </div>`;
+  }).join('');
+}
+
+/* ── Chord popup ── */
+function showPopup(id,e){
+  e.stopPropagation();
+  const ch=CHORDS.find(c=>c.id===id);
+  if(!ch) return;
+  const pop=document.getElementById('chord-popup');
+  document.getElementById('popup-name').textContent=`${ch.name}（${ch.full}）`;
+  document.getElementById('popup-diagram').innerHTML=chordSVG(ch,150);
+  pop.style.left=Math.min(e.clientX-80,window.innerWidth-200)+'px';
+  pop.style.top=(e.clientY+12)+'px';
+  pop.classList.add('show');
+}
+function closePopup(){ document.getElementById('chord-popup').classList.remove('show'); }
+document.addEventListener('click', closePopup);
+
+/* ── Init ── */
+switchTab('home');
+</script>
+</body>
+</html>
