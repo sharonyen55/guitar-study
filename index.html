@@ -78,10 +78,12 @@ body{background:#0f0f0f;color:#e0e0e0;font-family:'Segoe UI',sans-serif;min-heig
 .c-back{transform:rotateY(180deg);justify-content:space-between}
 .c-name{font-size:1.6rem;font-weight:700;color:#e8c97a}
 .c-type{font-size:.75rem;color:#888;margin-top:4px}
-.c-learned-tag{font-size:.7rem;color:#4caf7d;margin-top:8px}
+.c-learned-tag{font-size:.7rem;color:#7dbf8a;margin-top:8px}
+.c-card.learned .c-face,.c-card.learned .c-back{background:#163020;border-color:#2a5035}
 .c-diagram{flex:1;display:flex;align-items:center;justify-content:center;width:100%}
-.c-chk-btn{margin-top:8px;padding:5px 14px;border:none;border-radius:6px;font-size:.75rem;cursor:pointer;background:#2a3a2a;color:#4caf7d;transition:background .2s}
-.c-chk-btn.done{background:#1a2a1a}
+.c-chk-btn{margin-top:8px;font-size:10px;color:#888;display:flex;align-items:center;gap:4px;background:rgba(255,255,255,.06);border:1px solid #333;border-radius:20px;padding:4px 12px;cursor:pointer;transition:background .15s,border-color .15s}
+.c-chk-btn:hover{background:rgba(255,255,255,.1);border-color:#e8c97a}
+.c-card.learned .c-chk-btn{color:#7dbf8a;border-color:#2a5035}
 
 /* ── Song view ── */
 #song-view{display:none}
@@ -111,9 +113,9 @@ body{background:#0f0f0f;color:#e0e0e0;font-family:'Segoe UI',sans-serif;min-heig
 .chord-popup.show{display:flex}
 .chord-popup-name{font-size:1rem;font-weight:700;color:#e8c97a}
 /* chord learned */
-.popup-learn-btn{padding:4px 16px;border-radius:20px;border:1px solid #444;background:transparent;color:#888;font-size:.82rem;cursor:pointer;transition:all .15s}
-.popup-learn-btn:hover{background:#1e1e1e;border-color:#888}
-.popup-learn-btn.learned{background:#1a3020;color:#7dbf8a;border-color:#3a6040}
+.popup-learn-btn{font-size:10px;color:#888;display:flex;align-items:center;gap:4px;background:rgba(255,255,255,.06);border:1px solid #333;border-radius:20px;padding:4px 12px;cursor:pointer;transition:background .15s,border-color .15s}
+.popup-learn-btn:hover{background:rgba(255,255,255,.1);border-color:#e8c97a}
+.popup-learn-btn.learned{color:#7dbf8a;border-color:#2a5035}
 .tab-chord-card.learned .tab-chord-label{color:#7dbf8a}
 .inline-chord.learned{color:#7dbf8a}
 </style>
@@ -471,18 +473,18 @@ function renderChords(){
     </div>
     <div class="chord-grid">
       ${filtered.map(c=>`
-        <div class="c-card${isLearned(c.id)?' flipped':''}" id="cc-${c.id}" onclick="flipChord('${c.id}')">
+        <div class="c-card${isLearned(c.id)?' learned':''}" id="cc-${c.id}" onclick="flipChord('${c.id}')">
           <div class="c-inner">
             <div class="c-face">
               <div class="c-name">${c.name}</div>
               <div class="c-type">${c.full}</div>
-              ${isLearned(c.id)?'<div class="c-learned-tag">✓ 已記住</div>':''}
+              ${isLearned(c.id)?'<div class="c-learned-tag">✓ 已學會</div>':''}
               ${c.desc?`<div style="font-size:.72rem;color:#666;margin-top:8px;text-align:center">${c.desc}</div>`:''}
             </div>
             <div class="c-back">
               <div class="c-diagram">${chordSVG(c,130)}</div>
-              <button class="c-chk-btn${isLearned(c.id)?' done':''}" onclick="markChord(event,'${c.id}')">
-                ${isLearned(c.id)?'✓ 已記住':'標記記住'}
+              <button class="c-chk-btn" onclick="markChord(event,'${c.id}')">
+                ${isLearned(c.id)?'✓ 已學會':'標記學會'}
               </button>
             </div>
           </div>
@@ -494,15 +496,6 @@ function renderChords(){
 function flipChord(id){ document.getElementById('cc-'+id).classList.toggle('flipped'); }
 function markChord(e,id){ e.stopPropagation(); toggleLearned(id); renderChords(); renderSidebar(); }
 function setFilter(t){ chordFilter=t; renderChords(); }
-
-/* ── Chord learned state ── */
-const CKEY='guitar_chords_v1';
-let learnedChords=new Set(JSON.parse(localStorage.getItem(CKEY)||'[]'));
-function isLC(id){ return learnedChords.has(id); }
-function toggleLC(id){
-  if(learnedChords.has(id)) learnedChords.delete(id); else learnedChords.add(id);
-  localStorage.setItem(CKEY,JSON.stringify([...learnedChords]));
-}
 
 /* ── Songs view ── */
 let curSong=null;
@@ -573,7 +566,7 @@ function renderTabSheet(sheet){
       <div style="display:flex;flex-wrap:wrap;gap:14px;align-items:flex-start">
         ${chords.map(cid=>{
           const ch=CHORDS.find(c=>c.id===cid);
-          const lnd=isLC(cid);
+          const lnd=isLearned(cid);
           return `<div class="tab-chord-card${lnd?' learned':''}" onclick="showPopup('${cid}',event)">
             <div class="tab-chord-label">${cid}${lnd?' ✓':''}</div>
             ${ch?chordSVG(ch,90):`<div style="width:90px;height:110px;display:flex;align-items:center;justify-content:center;color:#555">${cid}</div>`}
@@ -597,7 +590,7 @@ function renderSheet(sheet){
     const chords=block.chords||[];
     const lyrics=block.lyrics||'';
     return `<div class="sheet-line">
-      <div class="chord-row">${chords.map(c=>`<span class="inline-chord${isLC(c)?' learned':''}" onclick="showPopup('${c}',event)">${c}${isLC(c)?' ✓':''}</span>`).join(' ')}</div>
+      <div class="chord-row">${chords.map(c=>`<span class="inline-chord${isLearned(c)?' learned':''}" onclick="showPopup('${c}',event)">${c}${isLearned(c)?' ✓':''}</span>`).join(' ')}</div>
       <div class="lyrics-row">${lyrics}</div>
     </div>`;
   }).join('');
@@ -620,15 +613,17 @@ function showPopup(id,e){
 }
 function updatePopupLearnBtn(){
   const btn=document.getElementById('popup-learn-btn');
-  const ok=isLC(popupCurId);
+  const ok=isLearned(popupCurId);
   btn.textContent=ok?'✓ 已學會':'標記學會';
   btn.className='popup-learn-btn'+(ok?' learned':'');
 }
 function handleLearnToggle(){
-  toggleLC(popupCurId);
+  toggleLearned(popupCurId);
   updatePopupLearnBtn();
   const s=SONGS.find(x=>x.id===curSong);
   if(s) document.querySelector('.sheet').innerHTML=curMode==='tab'?renderTabSheet(s.sheet):renderSheet(s.sheet);
+  renderChords();
+  renderHome();
 }
 function closePopup(){ document.getElementById('chord-popup').classList.remove('show'); }
 document.addEventListener('click', closePopup);
