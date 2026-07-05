@@ -235,9 +235,9 @@ function switchTab(t){
   ['chord','songs'].forEach(id=>{
     document.getElementById('nav-'+id)?.classList.toggle('active', id===t);
   });
-  document.getElementById('home-view').style.display  = t==='home'   ? '' : 'none';
-  document.getElementById('chord-view').style.display = t==='chord'  ? '' : 'none';
-  document.getElementById('song-view').style.display  = t==='songs'  ? '' : 'none';
+  document.getElementById('home-view').style.display  = t==='home'   ? 'block' : 'none';
+  document.getElementById('chord-view').style.display = t==='chord'  ? 'block' : 'none';
+  document.getElementById('song-view').style.display  = t==='songs'  ? 'block' : 'none';
   if(t==='home')  renderHome();
   if(t==='chord') renderChords();
   if(t==='songs') renderSongs();
