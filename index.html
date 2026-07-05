@@ -216,22 +216,29 @@ const CHORDS = [
 
 /* ── Intro TAB SVG ── */
 function introTabSVG(){
-  const W=900,H=128,ml=28,mr=12,mt=20,ss=13,nc=32;
+  const W=900,H=145,ml=46,mr=12,mt=22,ss=14,nc=32;
   const sp=(W-ml-mr)/nc;
   const pts=[3,2,1,0,1,2,3,2, 3,2,1,0,1,2,3,2, 4,2,1,0,1,2,3,2, 5,2,1,0,1,2,3,2];
   const hl=new Set([0,8,16,24]);
+  const labels=['e','B','G','D','A','E'];
   const sy=i=>mt+i*ss; const nx=i=>ml+(i+.5)*sp;
   let g=`<svg viewBox="0 0 ${W} ${H}" xmlns="http://www.w3.org/2000/svg" style="width:100%;max-width:${W}px;height:auto;display:block">`;
-  for(let i=0;i<6;i++) g+=`<line x1="${ml}" y1="${sy(i)}" x2="${W-mr}" y2="${sy(i)}" stroke="#363636" stroke-width="1"/>`;
-  for(let m=1;m<4;m++){const x=ml+m*8*sp;g+=`<line x1="${x}" y1="${mt-4}" x2="${x}" y2="${sy(5)+4}" stroke="#505050" stroke-width="1.5"/>`;}
-  const t0=sy(5)+6,t1=t0+11;
+  // string labels
+  for(let i=0;i<6;i++) g+=`<text x="${ml-8}" y="${sy(i)}" text-anchor="end" dominant-baseline="central" fill="#555" font-size="10" font-family="monospace">${labels[i]}</text>`;
+  // strings
+  for(let i=0;i<6;i++) g+=`<line x1="${ml}" y1="${sy(i)}" x2="${W-mr}" y2="${sy(i)}" stroke="#3c3c3c" stroke-width="1"/>`;
+  // bar lines
+  for(let m=1;m<4;m++){const x=ml+m*8*sp;g+=`<line x1="${x}" y1="${mt-5}" x2="${x}" y2="${sy(5)+5}" stroke="#555" stroke-width="1.5"/>`;}
+  // note tails
+  const t0=sy(5)+8,t1=t0+13;
   for(let i=0;i<nc;i+=2){const x1=nx(i),x2=nx(i+1);
-    g+=`<line x1="${x1}" y1="${t0}" x2="${x1}" y2="${t1}" stroke="#454545" stroke-width="1.2"/>`;
-    g+=`<line x1="${x2}" y1="${t0}" x2="${x2}" y2="${t1}" stroke="#454545" stroke-width="1.2"/>`;
-    g+=`<line x1="${x1}" y1="${t1}" x2="${x2}" y2="${t1}" stroke="#454545" stroke-width="2"/>`;}
+    g+=`<line x1="${x1}" y1="${t0}" x2="${x1}" y2="${t1}" stroke="#484848" stroke-width="1.2"/>`;
+    g+=`<line x1="${x2}" y1="${t0}" x2="${x2}" y2="${t1}" stroke="#484848" stroke-width="1.2"/>`;
+    g+=`<line x1="${x1}" y1="${t1}" x2="${x2}" y2="${t1}" stroke="#484848" stroke-width="2.2"/>`;}
+  // notes
   pts.forEach((si,i)=>{const x=nx(i),y=sy(si),h=hl.has(i);
-    if(h) g+=`<ellipse cx="${x}" cy="${y}" rx="9" ry="7.5" fill="rgba(232,201,122,.18)" stroke="rgba(232,201,122,.5)" stroke-width="1.2"/>`;
-    g+=`<text x="${x}" y="${y}" text-anchor="middle" dominant-baseline="central" fill="${h?'#e8c97a':'#909090'}" font-size="10" font-family="monospace" font-weight="bold">×</text>`;});
+    if(h) g+=`<circle cx="${x}" cy="${y}" r="9.5" fill="rgba(232,201,122,0.22)" stroke="#e8c97a" stroke-width="1.5"/>`;
+    g+=`<text x="${x}" y="${y}" text-anchor="middle" dominant-baseline="central" fill="${h?'#e8c97a':'#aaa'}" font-size="11.5" font-family="monospace" font-weight="bold">×</text>`;});
   return g+'</svg>';
 }
 
