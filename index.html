@@ -208,8 +208,8 @@ const CHORDS = [
 
 /* ── Songs ── */
 const SONGS = [
-  {id:1, title:"Love Story", artist:"Taylor Swift", note:"KEY D>E，CAPO 0", sheet:[
-    {type:'section', label:'前奏', strum:'分散和弦　④→③→②→①　Let Ring'},
+  {id:1, title:"Love Story", artist:"Taylor Swift", note:"D 大調直彈，無需變調夾（CAPO 0）· 副歌後轉 E 調", sheet:[
+    {type:'section', label:'前奏', strum:'分散和弦　④→③→②→①', tip:'💡 右手由低音弦（④）依序撥向高音弦（①）｜左手完整按好和弦，不要悶音｜讓每個音清晰延響 Let Ring'},
     {chords:['Dsus2','A'], lyrics:''},
     {chords:['Bm7','G'], lyrics:''},
     {chords:['Dsus2','A'], lyrics:''},
@@ -504,8 +504,11 @@ function openSong(id){
 function renderSheet(sheet){
   return (sheet||[]).map(block=>{
     if(block.type==='section') return `<div style="margin:16px 0 4px">
-      <span style="color:#888;font-size:.8rem;text-transform:uppercase">${block.label}</span>
-      ${block.strum?`<span style="margin-left:10px;font-size:.78rem;color:#e8c97a;letter-spacing:.05em;font-family:monospace">${block.strum}</span>`:''}
+      <div>
+        <span style="color:#888;font-size:.8rem;text-transform:uppercase">${block.label}</span>
+        ${block.strum?`<span style="margin-left:10px;font-size:.78rem;color:#e8c97a;letter-spacing:.05em;font-family:monospace">${block.strum}</span>`:''}
+      </div>
+      ${block.tip?`<div style="margin-top:5px;font-size:.76rem;color:#666;line-height:1.6;padding:5px 10px;border-left:2px solid #2a2a2a">${block.tip}</div>`:''}
     </div>`;
     const chords=block.chords||[];
     const lyrics=block.lyrics||'';
