@@ -89,6 +89,11 @@ body{background:#0f0f0f;color:#e0e0e0;font-family:'Segoe UI',sans-serif;min-heig
 .back-btn{padding:6px 14px;background:#2a2a2a;border:none;border-radius:6px;color:#aaa;cursor:pointer;font-size:.8rem;margin-bottom:16px}
 .back-btn:hover{color:#e8c97a}
 .song-header{margin-bottom:20px}
+.mode-toggle{display:flex;gap:6px;margin-top:12px}
+.mode-btn{padding:4px 14px;border-radius:4px;border:1px solid #2a2a2a;background:transparent;color:#555;font-size:.82rem;cursor:pointer;transition:background .15s,color .15s,border-color .15s}
+.mode-btn.active{background:#2a1e00;color:#e8c97a;border-color:#5a4010}
+.mode-btn:hover:not(.active){background:#1e1e1e;color:#aaa}
+.tab-block{font-family:'Courier New',monospace;font-size:.9rem;color:#ccc;line-height:1.8;white-space:pre;overflow-x:auto;padding:8px 0}
 .song-title-lg{font-size:1.4rem;font-weight:700;color:#e8c97a}
 .song-artist-sm{font-size:.85rem;color:#888;margin-top:2px}
 .sheet{line-height:2;font-size:.95rem}
@@ -208,7 +213,24 @@ const CHORDS = [
 
 /* ── Songs ── */
 const SONGS = [
-  {id:1, title:"Love Story", artist:"Taylor Swift", note:"D 大調直彈，無需變調夾（CAPO 0）· 副歌後轉 E 調", sheet:[
+  {id:1, title:"Love Story", artist:"Taylor Swift", note:"D 大調直彈，無需變調夾（CAPO 0）· 副歌後轉 E 調",
+   tab:`前奏 × 2   分散和弦，Let Ring
+
+  Dsus2         A           Bm7          G
+e|--0--|      |--0--|      |--2--|      |--3--|
+B|--3--|      |--2--|      |--3--|      |--3--|
+G|--2--|      |--2--|      |--2--|      |--0--|
+D|--0--|      |--2--|      |--0--|      |--0--|
+A|--x--|      |--0--|      |--2--|      |--2--|
+E|--x--|      |--x--|      |--x--|      |--3--|
+   ④③②①         ④③②①        ④③②①        ⑥③②①
+
+撥弦：右手從低音弦依序撥向高音弦，每個音清晰延響
+G 和弦低音起自第⑥弦（E 弦第 3 格 = G 音）
+
+─────────────────────────────────────────────
+主歌、副歌、橋段請切換回「和弦」模式查看`,
+   sheet:[
     {type:'section', label:'前奏', strum:'分散和弦　④→③→②→①', tip:'💡 右手由低音弦（④）依序撥向高音弦（①）｜左手完整按好和弦，不要悶音｜讓每個音清晰延響 Let Ring'},
     {chords:['Dsus2','A'], lyrics:''},
     {chords:['Bm7','G'], lyrics:''},
@@ -457,6 +479,8 @@ function setFilter(t){ chordFilter=t; renderChords(); }
 
 /* ── Songs view ── */
 let curSong=null;
+let curMode='chord';
+function setMode(m){ curMode=m; if(curSong) openSong(curSong); }
 let openArtists=new Set(SONGS.map(s=>s.artist||''));
 function toggleArtist(artist){
   if(openArtists.has(artist)) openArtists.delete(artist);
@@ -494,21 +518,28 @@ function openSong(id){
   const s=SONGS.find(x=>x.id===id);
   if(!s) return;
   renderSongList();
+  const hasTab=!!s.tab;
   document.getElementById('song-view').innerHTML=`
     <div class="song-header" style="margin-bottom:20px">
       <div class="song-title-lg">${s.title}</div>
       <div class="song-artist-sm">${s.artist||''}${s.note?` · ${s.note}`:''}</div>
+      ${hasTab?`<div class="mode-toggle">
+        <button class="mode-btn${curMode==='chord'?' active':''}" onclick="setMode('chord')">📋 和弦</button>
+        <button class="mode-btn${curMode==='tab'?' active':''}" onclick="setMode('tab')">🎸 TAB</button>
+      </div>`:''}
     </div>
-    <div class="sheet">${renderSheet(s.sheet)}</div>`;
+    ${curMode==='tab'&&hasTab
+      ? `<pre class="tab-block">${s.tab}</pre>`
+      : `<div class="sheet">${renderSheet(s.sheet)}</div>`}`;
 }
 function renderSheet(sheet){
   return (sheet||[]).map(block=>{
     if(block.type==='section') return `<div style="margin:16px 0 4px">
       <div>
         <span style="color:#888;font-size:.8rem;text-transform:uppercase">${block.label}</span>
-        ${block.strum?`<span style="margin-left:10px;font-size:.78rem;color:#e8c97a;letter-spacing:.05em;font-family:monospace">${block.strum}</span>`:''}
+        ${block.strum?`<span style="margin-left:10px;font-size:.88rem;color:#e8c97a;letter-spacing:.05em;font-family:monospace">${block.strum}</span>`:''}
       </div>
-      ${block.tip?`<div style="margin-top:5px;font-size:.76rem;color:#666;line-height:1.6;padding:5px 10px;border-left:2px solid #2a2a2a">${block.tip}</div>`:''}
+      ${block.tip?`<div style="margin-top:6px;font-size:.82rem;color:#777;line-height:1.7;padding:6px 12px;border-left:2px solid #2a2a2a">${block.tip}</div>`:''}
     </div>`;
     const chords=block.chords||[];
     const lyrics=block.lyrics||'';
