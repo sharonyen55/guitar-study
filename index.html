@@ -95,9 +95,6 @@ body{background:#0f0f0f;color:#e0e0e0;font-family:'Segoe UI',sans-serif;min-heig
 .mode-btn{padding:4px 14px;border-radius:4px;border:1px solid #2a2a2a;background:transparent;color:#555;font-size:.82rem;cursor:pointer;transition:background .15s,color .15s,border-color .15s}
 .mode-btn.active{background:#2a1e00;color:#e8c97a;border-color:#5a4010}
 .mode-btn:hover:not(.active){background:#1e1e1e;color:#aaa}
-.gtab-pre{font-family:'Courier New',Courier,monospace;font-size:.82rem;color:#bbb;line-height:2;overflow-x:auto;padding:12px 16px;background:#0d0d0d;border-radius:6px;border:1px solid #222;margin:8px 0 20px;white-space:pre}
-.gtab-chord-hint{font-size:.75rem;color:#555;font-family:monospace;margin-bottom:2px;padding-left:16px}
-.gtab-tacet{color:#444;font-size:.8rem;font-style:italic;padding:8px 0 16px;border-bottom:1px solid #1a1a1a}
 .tab-line{margin-bottom:20px}
 .tab-chord-card{display:inline-flex;flex-direction:column;align-items:center;cursor:pointer;margin-right:4px}
 .tab-chord-label{font-size:.78rem;color:#e8c97a;font-weight:600;margin-bottom:2px}
@@ -340,33 +337,21 @@ const SONGS = [
   {id:2, title:"軌跡", artist:"Roselia", note:"A 大調・Drop D Tuning（♩≈82）・譜面原標：Aadd9≈A、Dadd9≈D、Esus4≈E", sheet:[
 
     {type:'section', label:'前奏 Intro', strum:'分散和弦（鍵盤主旋律，吉他靜音）'},
-    {type:'gtab', tacet:'鍵盤主旋律起奏 ── 吉他 Drop D Tuning，起始後靜音 (Guitar tacet)'},
 
     {type:'section', label:'主歌 A'},
-    {type:'gtab', tacet:'吉他休止 (Guitar tacet)'},
     {chords:['A'], lyrics:`くつひもが ほどければ むすびなおす ように`},
     {chords:['E'], lyrics:`わかれても とぎれても`},
     {chords:['E','F#m'], lyrics:`またつながる ために であうべく`},
     {chords:['D'], lyrics:`ひとは あゆんでゆく`},
 
     {type:'section', label:'主歌 B'},
-    {type:'gtab', tacet:'吉他休止 (Guitar tacet)'},
     {chords:['D','A'], lyrics:`かなしみで むねのなか おぼれそうなら`},
     {chords:['E','F#m'], lyrics:`まぶたとじ むかえよう いつもかわらずに わらいあう`},
 
     {type:'section', label:'Pre-Chorus'},
-    {type:'gtab', tacet:'吉他休止 (Guitar tacet)'},
     {chords:['E','D'], lyrics:`たのしいひとみが ほらね ただきれい`},
 
     {type:'section', label:'副歌'},
-    {type:'gtab', hint:'E → A → F♯m / A / D  →  Bm7 / E / A  →  E / F♯m / A / D  →  C♯m / F♯m / D / E / A', tab:
-`e|--0---0---2---0---2---|--2---0---0---2---0---2---|
-B|--0---2---2---3---3---|--3---0---2---2---0---3---|
-G|--1---2---2---2---2---|--4---1---2---2---1---2---|
-D|--2---2---4---0---0---|--4---2---2---4---2---0---|
-A|--2---0---4---x---x---|--2---2---0---4---2---x---|
-E|--0---x---2---x---x---|--x---0---x---2---0---x---|
-     E   A  F#m  D   D      Bm7  E   A  F#m  E   D  `},
     {chords:['E','A'], lyrics:`"ありがとう" めぐりあうように いのちは`},
     {chords:['F#m','A','D','A'], lyrics:`くりかえしてく はじまりというなのみちを ふりむかず`},
     {chords:['Bm7','E','A'], lyrics:`まえをみつめ "ありがとう" まわるちきゅう`},
@@ -374,62 +359,22 @@ E|--0---x---2---x---x---|--x---0---x---2---0---x---|
     {chords:['C#m7','F#m','D','E','A'], lyrics:`おわらないきずなが ある`},
 
     {type:'section', label:'主歌 C'},
-    {type:'gtab', hint:'A → Esus4 → E → F♯m（和弦持音）', tab:
-`e|--0---0---0---2---|
-B|--2---0---0---2---|
-G|--2---2---1---2---|
-D|--2---2---2---4---|
-A|--0---2---2---4---|
-E|--x---0---0---2---|
-     A  Esus4  E  F#m`},
     {chords:['A','Esus4'], lyrics:`あすもまた くることが あたりまえのように ふるまうのを うたがわず`},
     {chords:['E','F#m'], lyrics:`ほしょうもない ひびの はかなき ひとは`},
 
     {type:'section', label:'間奏 E（吉他主奏）'},
-    {type:'gtab', hint:'p.204-205 吉他主奏 ── D/A(Aadd9) 分散和弦 → F♯m 旋律線', tab:
-`  D(Dadd9)         A(Aadd9)                                     E
-e|--2--------------|--0---2---0---2---0---2---0---2------------|--0---0---0---|
-B|--3--------------|--2---2---2---2---2---2---2---2------------|--0---0---0---|
-G|--2--------------|--2---2---2---2---2---2---2---2------------|--1---1---1---|
-D|--0--------------|--2---2---2---2---2---2---2---2------------|--2---2---2---|
-A|--x--------------|--0---0---0---0---0---0---0---0------------|--2---2---2---|
-E|--x--------------|--x-----------------------------------------|--0---0---0---|
-
-  F♯m（旋律 ─ 參照樂譜 p.204-205 實際拍位）     Esus4
-e|--9---7---9---9---9---7---9---7---9---------|--0---|
-B|--7-----------7-----------7-----------7--9--|--0---|
-G|--2-----------2-----------2-----------2--2--|--2---|
-D|--4-----------4-----------4-----------4--4--|--2---|
-A|--4-----------4-----------4-----------4--4--|--2---|
-E|--2-----------2-----------2-----------2--2--|--0---|`},
     {chords:['D','A'], lyrics:`いだいてる ふりかえる やさしきに`},
     {chords:['A','E'], lyrics:`みちた まいにちは たいせつなものたちを のこしてくれた`},
     {chords:['F#m','E','D'], lyrics:`やわらく こちよい いろはほら ね`},
     {chords:['D','Esus4','E'], lyrics:`ただきれい "ありがとう"`},
 
     {type:'section', label:'副歌 2'},
-    {type:'gtab', hint:'A / E / F♯m / Esus4  →  D / A / Bm7 / E  →  D / C♯m / F♯m / E / A', tab:
-`e|--0---0---2---0---|--2---0---2---0---|--2---4---2---0---0---|
-B|--2---0---2---0---|--3---2---2---0---|--3---4---2---0---2---|
-G|--2---1---2---2---|--2---2---2---1---|--2---6---2---1---2---|
-D|--2---2---4---2---|--0---2---4---2---|--0---6---4---2---2---|
-A|--0---2---4---2---|--x---0---2---2---|--x---4---4---2---0---|
-E|--x---0---2---0---|--x---x---x---0---|--x---x---2---0---x---|
-     A   E  F#m Esus4   D   A  Bm7  E      D  C#m F#m  E   A`},
     {chords:['A','E','F#m','Esus4'], lyrics:`うたをうたい ひたすら いとしきをつげ`},
     {chords:['D','A','Bm7','E'], lyrics:`ふれだすおもいは ずっと ほしのように またたく から "ありがとう"`},
     {chords:['A','E','F#m','Esus4'], lyrics:`まわるちきゅう あなたと わたしは すすむ`},
     {chords:['D','C#m7','F#m','D','E','A'], lyrics:`すごすばしょ ちがっても かわらないけしきがある`},
 
     {type:'section', label:'Bridge'},
-    {type:'gtab', hint:'A / D → F♯m / A / Bm7 → C♯m / D → Esus4 / E', tab:
-`e|--0---2---|--2---0---2---|--4---2---|--0---0---|
-B|--2---3---|--2---2---3---|--4---3---|--0---0---|
-G|--2---2---|--2---2---4---|--6---2---|--2---1---|
-D|--2---0---|--4---2---4---|--6---0---|--2---2---|
-A|--0---x---|--4---0---2---|--4---x---|--2---2---|
-E|--x---x---|--2---x---x---|--x---x---|--0---0---|
-     A   D      F#m  A  Bm7   C#m  D    Esus4  E`},
     {chords:['A','D'], lyrics:`よみがえる あのすがた`},
     {chords:['D'], lyrics:`ふとよみがえる あのすがた`},
     {chords:['F#m','A','Bm7'], lyrics:`こころは さざめき だれだって つらくないのは`},
@@ -437,14 +382,6 @@ E|--x---x---|--2---x---x---|--x---x---|--0---0---|
     {chords:['Esus4','E'], lyrics:`つたえたい "ありがとう"`},
 
     {type:'section', label:'副歌 3（最終）'},
-    {type:'gtab', hint:'副歌 3 和弦按位（同副歌）', tab:
-`e|--0---0---2---0---|--2---0---0---2---0---2---|
-B|--2---0---2---2---|--3---0---2---2---0---3---|
-G|--2---2---2---2---|--4---1---2---2---1---2---|
-D|--2---2---4---2---|--4---2---2---4---2---0---|
-A|--0---2---4---2---|--2---2---0---4---2---x---|
-E|--x---0---2---0---|--x---0---x---2---0---x---|
-     A  Esus4 F#m A    Bm7  E   A  F#m  E   D`},
     {chords:['A','Esus4','F#m','A'], lyrics:`ここであえた あなたと わたしのきせき`},
     {chords:['D','A','Bm7'], lyrics:`ひとつだって わすれないわ いつまでも あついまで`},
     {chords:['F#m','A','D','A'], lyrics:`くりかえしてく はじまりというなのみちを ふりむかず`},
@@ -453,14 +390,6 @@ E|--x---0---2---0---|--x---0---x---2---0---x---|
     {chords:['C#m7','F#m','D','Esus4','E','A'], lyrics:`おわらないきずなが ある`},
 
     {type:'section', label:'尾奏 Outro', strum:'吉他分散和弦漸弱'},
-    {type:'gtab', hint:'Dadd9 → Esus4 → Dadd9（分散和弦漸弱收尾）', tab:
-`e|--2---0---2---|
-B|--3---0---3---|
-G|--2---2---2---|
-D|--0---2---0---|
-A|--x---2---x---|
-E|--x---0---x---|
-     D  Esus4  D`},
     {chords:['D','Esus4','D'], lyrics:`せんもとわをかさね`},
   ]},
 ];
@@ -680,10 +609,9 @@ function openSong(id){
       <div class="mode-toggle">
         <button class="mode-btn${curMode==='chord'?' active':''}" onclick="setMode('chord')">📋 和弦</button>
         <button class="mode-btn${curMode==='tab'?' active':''}" onclick="setMode('tab')">🎸 和弦圖</button>
-        ${s.sheet.some(b=>b.type==='gtab')?`<button class="mode-btn${curMode==='gtab'?' active':''}" onclick="setMode('gtab')">🎼 吉他TAB</button>`:''}
       </div>
     </div>
-    <div class="sheet">${curMode==='gtab' ? renderGuitarTab(s.sheet) : curMode==='tab' ? renderTabSheet(s.sheet) : renderSheet(s.sheet)}</div>`;
+    <div class="sheet">${curMode==='tab' ? renderTabSheet(s.sheet) : renderSheet(s.sheet)}</div>`;
 }
 function renderTabSheet(sheet){
   return (sheet||[]).map(block=>{
@@ -732,21 +660,6 @@ function renderSheet(sheet){
   }).join('');
 }
 
-function renderGuitarTab(sheet){
-  return (sheet||[]).map(block=>{
-    if(block.type==='section') return `<div style="margin:22px 0 6px">
-      <span style="color:#888;font-size:.8rem;text-transform:uppercase">${block.label}</span>
-      ${block.strum?`<span style="margin-left:10px;font-size:.82rem;color:#e8c97a;font-family:monospace">${block.strum}</span>`:''}
-    </div>`;
-    if(block.type==='gtab'){
-      if(block.tacet) return `<div class="gtab-tacet">${block.tacet}</div>`;
-      return `${block.hint?`<div class="gtab-chord-hint">${block.hint}</div>`:''}
-        <pre class="gtab-pre">${block.tab}</pre>`;
-    }
-    return '';
-  }).join('');
-}
-
 /* ── Chord popup ── */
 let popupCurId=null;
 function showPopup(id,e){
@@ -772,7 +685,7 @@ function handleLearnToggle(){
   toggleLearned(popupCurId);
   updatePopupLearnBtn();
   const s=SONGS.find(x=>x.id===curSong);
-  if(s) document.querySelector('.sheet').innerHTML=curMode==='gtab'?renderGuitarTab(s.sheet):curMode==='tab'?renderTabSheet(s.sheet):renderSheet(s.sheet);
+  if(s) document.querySelector('.sheet').innerHTML=curMode==='tab'?renderTabSheet(s.sheet):renderSheet(s.sheet);
   renderChords();
   renderHome();
 }
