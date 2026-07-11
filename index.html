@@ -765,7 +765,7 @@ function renderChords(){
         const diff=DIFF_HINTS[c.id];
         const diffMsg=diff?`<div class="diff-msg">👆 ${diff.msg}</div>`:'';
         const proto=BARRE_PROTOTYPES[c.id];
-        const protoBtn=proto?`<button class="proto-btn" onclick="event.stopPropagation();showProto('${c.id}')">🔄 顯示原型</button>`:'';
+        const protoBtn=proto?`<button class="proto-btn" onclick="event.stopPropagation();showProto('${c.id}')">🔍 顯示原型</button>`:'';
         return `
         <div class="c-card${isLearned(c.id)?' learned':''}" id="cc-${c.id}" onclick="flipChord('${c.id}')">
           <div class="c-inner">
@@ -781,9 +781,9 @@ function renderChords(){
             <div class="c-back">
               <div class="c-diagram ghost-on">${chordSVG(c,130,{ghosts:diff?.ghosts})}</div>
               ${diffMsg}
-              <div style="display:flex;flex-direction:column;align-items:center;gap:5px;width:100%">
+              <div style="display:flex;flex-direction:row;gap:6px;width:100%;justify-content:${proto?'space-between':'center'}">
                 ${protoBtn}
-                <button class="c-chk-btn" onclick="markChord(event,'${c.id}')">
+                <button class="c-chk-btn" style="margin-top:0;flex:${proto?'1':''}" onclick="markChord(event,'${c.id}')">
                   ${isLearned(c.id)?'✓ 已學會':'標記學會'}
                 </button>
               </div>
