@@ -227,6 +227,12 @@ const CHORDS = [
 
   {id:"D5", name:"D5", full:"D power", type:"power",
    strings:[null,null,7,7,5,null], fingers:[null,null,4,3,1,null], startFret:5, desc:"電吉他副歌萬用強力和弦"},
+
+  {id:"F#m", strings:[2,2,2,4,4,2], barre:{fret:2,from:1,to:6}, fingers:[null,null,null,4,3,null], startFret:2,
+   name:"F♯m", full:"F sharp minor", desc:"Em 形封閉和弦，2fr 全按，J-pop 必備"},
+
+  {id:"Esus4", strings:[0,0,2,2,2,0], fingers:[null,null,3,2,1,null], startFret:1,
+   name:"Esus4", full:"E suspended 4th", desc:"A/D/G 弦同時按 2fr，開放弦帶飄浮感"},
 ];
 
 /* ── Intro TAB SVG ── */
@@ -326,6 +332,65 @@ const SONGS = [
     {chords:['E','B','C#m7','A','B'], lyrics:`Oh, oh, oh`},
     {chords:['E','B','C#m7','A','B'], lyrics:`Oh, oh, oh, oh`},
     {chords:['E','B','C#m7','A','B'], lyrics:`'Cause we were both young when I first saw you`},
+  ]},
+
+  {id:2, title:"軌跡", artist:"Roselia", note:"A 大調・Drop D Tuning（♩≈82）・譜面原標：Aadd9≈A、Dadd9≈D、Esus4≈E", sheet:[
+
+    {type:'section', label:'前奏 Intro', strum:'分散和弦（鍵盤主旋律，吉他靜音）'},
+
+    {type:'section', label:'主歌 A'},
+    {chords:['A'], lyrics:`くつひもが ほどければ むすびなおす ように`},
+    {chords:['E'], lyrics:`わかれても とぎれても`},
+    {chords:['E','F#m'], lyrics:`またつながる ために であうべく`},
+    {chords:['D'], lyrics:`ひとは あゆんでゆく`},
+
+    {type:'section', label:'主歌 B'},
+    {chords:['D','A'], lyrics:`かなしみで むねのなか おぼれそうなら`},
+    {chords:['E','F#m'], lyrics:`まぶたとじ むかえよう いつもかわらずに わらいあう`},
+
+    {type:'section', label:'Pre-Chorus'},
+    {chords:['E','D'], lyrics:`たのしいひとみが ほらね ただきれい`},
+
+    {type:'section', label:'副歌'},
+    {chords:['E','A'], lyrics:`"ありがとう" めぐりあうように いのちは`},
+    {chords:['F#m','A','D','A'], lyrics:`くりかえしてく はじまりというなのみちを ふりむかず`},
+    {chords:['Bm7','E','A'], lyrics:`まえをみつめ "ありがとう" まわるちきゅう`},
+    {chords:['E','F#m','A','D'], lyrics:`あなたと わたしは すすむ にぎったてを はなれても`},
+    {chords:['C#m7','F#m','D','E','A'], lyrics:`おわらないきずなが ある`},
+
+    {type:'section', label:'主歌 C'},
+    {chords:['A','Esus4'], lyrics:`あすもまた くることが あたりまえのように ふるまうのを うたがわず`},
+    {chords:['E','F#m'], lyrics:`ほしょうもない ひびの はかなき ひとは`},
+
+    {type:'section', label:'間奏 E（吉他主奏）'},
+    {chords:['D','A'], lyrics:`いだいてる ふりかえる やさしきに`},
+    {chords:['A','E'], lyrics:`みちた まいにちは たいせつなものたちを のこしてくれた`},
+    {chords:['F#m','E','D'], lyrics:`やわらく こちよい いろはほら ね`},
+    {chords:['D','Esus4','E'], lyrics:`ただきれい "ありがとう"`},
+
+    {type:'section', label:'副歌 2'},
+    {chords:['A','E','F#m','Esus4'], lyrics:`うたをうたい ひたすら いとしきをつげ`},
+    {chords:['D','A','Bm7','E'], lyrics:`ふれだすおもいは ずっと ほしのように またたく から "ありがとう"`},
+    {chords:['A','E','F#m','Esus4'], lyrics:`まわるちきゅう あなたと わたしは すすむ`},
+    {chords:['D','C#m7','F#m','D','E','A'], lyrics:`すごすばしょ ちがっても かわらないけしきがある`},
+
+    {type:'section', label:'Bridge'},
+    {chords:['A','D'], lyrics:`よみがえる あのすがた`},
+    {chords:['D'], lyrics:`ふとよみがえる あのすがた`},
+    {chords:['F#m','A','Bm7'], lyrics:`こころは さざめき だれだって つらくないのは`},
+    {chords:['C#m7','D'], lyrics:`そうだけど きっと ことばでもっと`},
+    {chords:['Esus4','E'], lyrics:`つたえたい "ありがとう"`},
+
+    {type:'section', label:'副歌 3（最終）'},
+    {chords:['A','Esus4','F#m','A'], lyrics:`ここであえた あなたと わたしのきせき`},
+    {chords:['D','A','Bm7'], lyrics:`ひとつだって わすれないわ いつまでも あついまで`},
+    {chords:['F#m','A','D','A'], lyrics:`くりかえしてく はじまりというなのみちを ふりむかず`},
+    {chords:['Bm7','Esus4','E','A'], lyrics:`まえをみつめ "ありがとう" まわるちきゅう`},
+    {chords:['E','F#m','A','D'], lyrics:`あなたと わたしは すすむ にぎったてを はなれても`},
+    {chords:['C#m7','F#m','D','Esus4','E','A'], lyrics:`おわらないきずなが ある`},
+
+    {type:'section', label:'尾奏 Outro', strum:'吉他分散和弦漸弱'},
+    {chords:['D','Esus4','D'], lyrics:`せんもとわをかさね`},
   ]},
 ];
 
