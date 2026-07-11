@@ -192,6 +192,24 @@ body{background:#0f0f0f;color:#e0e0e0;font-family:'Segoe UI',sans-serif;min-heig
 .slide-play-btn{width:100%;padding:5px 0;font-size:.73rem;color:#d9955b;background:rgba(217,149,91,.07);border:1px solid rgba(217,149,91,.3);border-radius:10px;cursor:pointer;transition:all .15s}
 .slide-play-btn:hover:not(:disabled){background:rgba(217,149,91,.18);border-color:#d9955b}
 .slide-play-btn:disabled{opacity:.35;cursor:default}
+
+/* ── Chord Detector ── */
+.det-wrap{display:flex;flex-direction:column;align-items:center;gap:14px}
+.det-mic-btn{padding:11px 32px;font-size:.95rem;font-weight:700;border-radius:50px;border:2px solid #444;background:transparent;color:#888;cursor:pointer;transition:all .25s;letter-spacing:.04em}
+.det-mic-btn:hover{border-color:#aaa;color:#ccc}
+.det-mic-btn.active{border-color:#c84b4b;color:#c84b4b;background:rgba(200,75,75,.1);animation:micPulse 1.2s ease-in-out infinite}
+@keyframes micPulse{0%,100%{box-shadow:0 0 0 0 rgba(200,75,75,.4)}50%{box-shadow:0 0 0 10px rgba(200,75,75,0)}}
+.det-canvas{width:100%;height:56px;border-radius:6px;background:#111;border:1px solid #1e1e1e}
+.det-result{width:100%;display:flex;flex-direction:column;gap:8px}
+.det-big{font-size:2.8rem;font-weight:800;color:#e8c97a;letter-spacing:.04em;min-height:64px;display:flex;align-items:center;justify-content:center;width:100%}
+.det-chord-row{display:flex;align-items:center;gap:10px}
+.det-chord-name{font-size:1rem;font-weight:700;color:#e8c97a;width:58px;flex-shrink:0}
+.det-bar-bg{flex:1;height:7px;background:#222;border-radius:4px;overflow:hidden}
+.det-bar-fill{height:100%;border-radius:4px;background:#e8c97a;transition:width .18s}
+.det-bar-fill.r2{background:#555}
+.det-bar-fill.r3{background:#333}
+.det-pct{font-size:.73rem;color:#555;width:34px;text-align:right}
+.det-hint{font-size:.72rem;color:#444;text-align:center;line-height:1.6}
 </style>
 </head>
 <body>
@@ -631,6 +649,7 @@ function switchTab(t){
   document.getElementById('song-view').style.display  = t==='songs' ?'block':'none';
   document.getElementById('train-view').style.display = t==='train' ?'block':'none';
   document.getElementById('song-list').style.display  = t==='songs' ?'block':'none';
+  if(t!=='train') stopDetector();
   if(t==='home')  { curSong=null; renderHome(); }
   if(t==='chord') renderChords();
   if(t==='songs') renderSongList();
@@ -982,9 +1001,141 @@ function renderSlideGrid(){
   }).join('')}</div>`;
 }
 
+/* ── Chord Detector ── */
+let detCtx=null,detAna=null,detStream=null,detRAF=null,detRunning=false;
+const STRING_BASE_MIDI=[64,59,55,50,45,40]; // ①e=E4=64, ②B=59, ③G=55, ④D=50, ⑤A=45, ⑥E=40
+
+function noteClass(midi){return((midi%12)+12)%12;}
+function freqToMidi(f){return Math.round(12*Math.log2(f/440)+69);}
+
+const _cnCache=new Map();
+function chordNoteClasses(ch){
+  if(_cnCache.has(ch.id)) return _cnCache.get(ch.id);
+  const s=new Set();
+  ch.strings.forEach((fret,i)=>{ if(fret!==null) s.add(noteClass(STRING_BASE_MIDI[i]+fret)); });
+  _cnCache.set(ch.id,s);
+  return s;
+}
+
+function scoreChord(detected,ch){
+  const cn=chordNoteClasses(ch);
+  let hits=0;
+  detected.forEach(nc=>{ if(cn.has(nc)) hits++; });
+  const precision=detected.size?hits/detected.size:0;
+  const recall=cn.size?hits/cn.size:0;
+  return (precision*0.6+recall*0.4);
+}
+
+function getPeakNoteClasses(ana){
+  const buf=new Float32Array(ana.frequencyBinCount);
+  ana.getFloatFrequencyData(buf);
+  const binHz=detCtx.sampleRate/ana.fftSize;
+  const peaks=new Set();
+  const thr=-52;
+  const lo=Math.floor(70/binHz), hi=Math.ceil(1300/binHz);
+  for(let i=lo+1;i<hi-1&&i<buf.length-1;i++){
+    if(buf[i]>thr&&buf[i]>buf[i-1]&&buf[i]>buf[i+1]){
+      const midi=freqToMidi(i*binHz);
+      if(midi>=28&&midi<=88) peaks.add(noteClass(midi));
+    }
+  }
+  return peaks;
+}
+
+async function toggleDetector(){
+  if(detRunning){ stopDetector(); return; }
+  try{
+    detStream=await navigator.mediaDevices.getUserMedia({audio:{echoCancellation:false,noiseSuppression:false,autoGainControl:false},video:false});
+    detCtx=new (window.AudioContext||window.webkitAudioContext)();
+    const src=detCtx.createMediaStreamSource(detStream);
+    detAna=detCtx.createAnalyser();
+    detAna.fftSize=8192;
+    detAna.smoothingTimeConstant=0.65;
+    src.connect(detAna);
+    detRunning=true;
+    const btn=document.getElementById('det-mic-btn');
+    if(btn){btn.classList.add('active');btn.textContent='⏹ 停止聆聽';}
+    runDetector();
+  }catch(err){
+    alert('無法開啟麥克風：'+err.message);
+  }
+}
+
+function stopDetector(){
+  detRunning=false;
+  if(detRAF) cancelAnimationFrame(detRAF);
+  if(detStream) detStream.getTracks().forEach(t=>t.stop());
+  if(detCtx) detCtx.close();
+  detStream=detCtx=detAna=null;
+  const btn=document.getElementById('det-mic-btn');
+  if(btn){btn.classList.remove('active');btn.textContent='🎙 開始聆聽';}
+}
+
+function drawSpectrum(){
+  const canvas=document.getElementById('det-canvas');
+  if(!canvas||!detAna) return;
+  const ctx2=canvas.getContext('2d');
+  const W=canvas.width,H=canvas.height;
+  ctx2.clearRect(0,0,W,H);
+  const buf=new Uint8Array(detAna.frequencyBinCount);
+  detAna.getByteFrequencyData(buf);
+  const binHz=detCtx.sampleRate/detAna.fftSize;
+  const lo=Math.floor(60/binHz),hi=Math.ceil(1400/binHz);
+  for(let i=0;i<W;i++){
+    const b=Math.floor(lo+(hi-lo)*i/W);
+    if(b>=buf.length) break;
+    const v=buf[b]/255;
+    ctx2.fillStyle=`rgba(232,201,122,${0.3+v*0.7})`;
+    ctx2.fillRect(i,H*(1-v),1,H*v);
+  }
+}
+
+let _detThrottle=0;
+function runDetector(){
+  if(!detRunning) return;
+  drawSpectrum();
+  const now=performance.now();
+  if(now-_detThrottle>120){
+    _detThrottle=now;
+    const peaks=getPeakNoteClasses(detAna);
+    if(peaks.size>=2){
+      const scores=CHORDS.map(c=>({c,s:scoreChord(peaks,c)}))
+        .sort((a,b)=>b.s-a.s).slice(0,3);
+      renderDetResult(scores);
+    } else {
+      const el=document.getElementById('det-result');
+      if(el) el.innerHTML=`<div class="det-big" style="color:#2a2a2a">—</div>`;
+    }
+  }
+  detRAF=requestAnimationFrame(runDetector);
+}
+
+function renderDetResult(scores){
+  const el=document.getElementById('det-result');
+  if(!el) return;
+  if(scores[0].s<0.28){ el.innerHTML=`<div class="det-big" style="color:#2a2a2a">—</div>`; return; }
+  el.innerHTML=`
+    <div class="det-big">${scores[0].c.name}</div>
+    ${scores.map(({c,s},i)=>`<div class="det-chord-row">
+      <div class="det-chord-name" style="${i>0?'color:#555;font-size:.88rem':''}">${c.name}</div>
+      <div class="det-bar-bg"><div class="det-bar-fill${i===1?' r2':i===2?' r3':''}" style="width:${Math.round(s*100)}%"></div></div>
+      <div class="det-pct">${Math.round(s*100)}%</div>
+    </div>`).join('')}
+  `;
+}
+
 function renderTrain(){
   document.getElementById('train-view').innerHTML=`
     <div class="home-title">💪 肌肉記憶特訓</div>
+    <div class="train-sec">
+      <div class="train-sec-hd">🎙 聽音辨弦 · 刷弦讓系統猜和弦</div>
+      <div class="det-wrap">
+        <div class="det-hint">刷一個和弦，系統分析頻率並猜測你按的是哪個和弦<br>建議靠近麥克風、刷弦後稍等 0.5 秒讓音持續</div>
+        <button class="det-mic-btn" id="det-mic-btn" onclick="toggleDetector()">🎙 開始聆聽</button>
+        <canvas class="det-canvas" id="det-canvas" width="700" height="56"></canvas>
+        <div class="det-result" id="det-result"><div class="det-big" style="color:#2a2a2a">—</div></div>
+      </div>
+    </div>
     <div class="train-sec">
       <div class="train-sec-hd">⚡ 快閃字卡 · Active Recall 盲背測驗</div>
       <div id="fc-area"></div>
