@@ -118,6 +118,40 @@ body{background:#0f0f0f;color:#e0e0e0;font-family:'Segoe UI',sans-serif;min-heig
 .popup-learn-btn.learned{color:#4caf7d;border-color:#4caf7d}
 .tab-chord-card.learned .tab-chord-label{color:#4caf7d}
 .inline-chord.learned{color:#4caf7d}
+
+/* ── CAGED family tabs ── */
+.caged-tabs{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:10px}
+.caged-tab{padding:5px 16px;border:1px solid #333;border-radius:20px;background:transparent;color:#888;cursor:pointer;font-size:.8rem;transition:all .2s}
+.caged-tab:hover{border-color:#555;color:#ccc}
+/* family chip on card front */
+.fam-chip{display:inline-block;font-size:.6rem;font-weight:700;letter-spacing:.04em;padding:1px 8px;border-radius:10px;margin-bottom:5px}
+.fam-chip-E{background:rgba(91,141,217,.18);color:#5b8dd9;border:1px solid rgba(91,141,217,.35)}
+.fam-chip-A{background:rgba(217,149,91,.18);color:#d9955b;border:1px solid rgba(217,149,91,.35)}
+.fam-chip-D{background:rgba(91,217,140,.18);color:#5bd98c;border:1px solid rgba(91,217,140,.35)}
+/* CAGED insight banner */
+.caged-banner{border-radius:8px;padding:10px 14px;margin-bottom:14px;font-size:.8rem;line-height:1.6;display:none}
+.caged-banner.show{display:block}
+/* memory tip on card front */
+.c-memory-tip{font-size:.63rem;color:#555;margin-top:7px;line-height:1.5;text-align:center;padding:0 4px;transition:color .2s}
+.c-card:hover .c-memory-tip{color:#999}
+/* prototype button (inside flipped card back) */
+.proto-btn{font-size:.68rem;color:#5b8dd9;background:rgba(91,141,217,.08);border:1px solid rgba(91,141,217,.28);border-radius:12px;padding:3px 10px;cursor:pointer;transition:all .15s;white-space:nowrap}
+.proto-btn:hover{background:rgba(91,141,217,.2);border-color:#5b8dd9}
+/* prototype overlay */
+.proto-overlay{position:fixed;inset:0;background:rgba(0,0,0,.75);z-index:200;display:none;align-items:center;justify-content:center}
+.proto-overlay.show{display:flex}
+.proto-box{background:#1e1e1e;border:1px solid #333;border-radius:16px;padding:26px 28px;max-width:500px;width:92%;position:relative;animation:fuUp .2s ease}
+@keyframes fuUp{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
+.proto-close-btn{position:absolute;top:12px;right:14px;background:none;border:none;color:#555;font-size:18px;cursor:pointer;line-height:1;padding:2px 6px;border-radius:4px}
+.proto-close-btn:hover{color:#ccc;background:#2a2a2a}
+.proto-box-title{font-size:.7rem;color:#555;text-transform:uppercase;letter-spacing:.07em;margin-bottom:18px}
+.proto-row{display:flex;align-items:center;justify-content:center;gap:12px;flex-wrap:wrap}
+.proto-side{display:flex;flex-direction:column;align-items:center;gap:4px}
+.proto-side-name{font-size:1.05rem;font-weight:700;color:#e8c97a}
+.proto-side-lbl{font-size:.72rem;color:#666}
+.proto-mid{display:flex;flex-direction:column;align-items:center;gap:2px;color:#5b8dd9;font-size:.72rem;text-align:center;padding:0 4px}
+.proto-mid-arrow{font-size:1.8rem;line-height:1}
+.proto-insight{margin-top:18px;font-size:.8rem;color:#aaa;line-height:1.7;background:#131313;border-radius:8px;padding:10px 14px;border-left:2px solid #5b8dd9}
 </style>
 </head>
 <body>
@@ -160,6 +194,14 @@ body{background:#0f0f0f;color:#e0e0e0;font-family:'Segoe UI',sans-serif;min-heig
   <div class="chord-popup-name" id="popup-name"></div>
   <div id="popup-diagram"></div>
   <button class="popup-learn-btn" id="popup-learn-btn" onclick="event.stopPropagation();handleLearnToggle()"></button>
+</div>
+
+<!-- Prototype comparison modal -->
+<div class="proto-overlay" id="proto-overlay" onclick="closeProto()">
+  <div class="proto-box" onclick="event.stopPropagation()">
+    <button class="proto-close-btn" onclick="closeProto()">✕</button>
+    <div id="proto-content"></div>
+  </div>
 </div>
 
 <script>
@@ -228,10 +270,10 @@ const CHORDS = [
   {id:"D5", name:"D5", full:"D power", type:"power",
    strings:[null,null,7,7,5,null], fingers:[null,null,4,3,1,null], startFret:5, desc:"電吉他副歌萬用強力和弦"},
 
-  {id:"F#m", strings:[2,2,2,4,4,2], barre:{fret:2,from:1,to:6}, fingers:[null,null,null,4,3,null], startFret:2,
+  {id:"F#m", type:"barre", strings:[2,2,2,4,4,2], barre:{fret:2,from:1,to:6}, fingers:[null,null,null,4,3,null], startFret:2,
    name:"F♯m", full:"F sharp minor", desc:"Em 形封閉和弦，2fr 全按，J-pop 必備"},
 
-  {id:"Esus4", strings:[0,0,2,2,2,0], fingers:[null,null,3,2,1,null], startFret:1,
+  {id:"Esus4", type:"open", strings:[0,0,2,2,2,0], fingers:[null,null,3,2,1,null], startFret:1,
    name:"Esus4", full:"E suspended 4th", desc:"A/D/G 弦同時按 2fr，開放弦帶飄浮感"},
 ];
 
@@ -404,9 +446,45 @@ const SONGS = [
   ]},
 ];
 
+/* ── CAGED Memory System ── */
+const CAGED_FAMILIES = [
+  { key:'E', label:'E 骨架家族', chipLabel:'E 骨架', color:'#5b8dd9',
+    members:['E','Em','F','F#m','G'],
+    insight:'E / Em 指型平移：F = E 往右 1 格，F♯m = Em 往右 2 格，G = E 往右 3 格（開放版）。看到任何一個，腦中先浮現 E 指型！' },
+  { key:'A', label:'A 骨架家族', chipLabel:'A 骨架', color:'#d9955b',
+    members:['A','Am','B','Bm','Bm7','C#m7'],
+    insight:'A / Am 指型平移：B = A 往右 2 格，Bm / Bm7 = Am 往右 2 格，C♯m7 = Am 往右 4 格。看到封閉和弦，腦中先閃 A / Am！' },
+  { key:'D', label:'D 骨架家族', chipLabel:'D 骨架', color:'#5bd98c',
+    members:['D','Dm','Dsus2'],
+    insight:'D 家族三兄弟：同按 ①②③ 弦，只需微調一兩根手指即可互換。D ↔ Dm ↔ Dsus2 一秒切換！' },
+];
+const BARRE_PROTOTYPES = {
+  'F':    { protoId:'E',  shift:1, insight:'腦中先想 E 指型 → 整個往右移 1 格 → 食指加蓋橫按 6 弦，這就是 F！' },
+  'F#m':  { protoId:'Em', shift:2, insight:'腦中先想 Em 指型 → 往右移 2 格 → 食指橫按，這就是 F♯m！' },
+  'Bm':   { protoId:'Am', shift:2, insight:'腦中先想 Am 指型 → 往右移 2 格 → 食指加蓋橫按，這就是 Bm！' },
+  'Bm7':  { protoId:'Am', shift:2, insight:'Bm7 = Am 指型往右 2 格，再放開無名指＋小指，只剩食指＋中指！' },
+  'B':    { protoId:'A',  shift:2, insight:'腦中先想 A 指型 → 往右移 2 格 → 食指加蓋橫按，這就是 B！' },
+  'C#m7': { protoId:'Am', shift:4, insight:'C♯m7 = Am 指型往右 4 格，手型與 Bm7 完全相同，只是位置更高！' },
+};
+const MEMORY_TIPS = {
+  'Em':   '💡 比 E 少按一根手指（中指）——放開中指，E 瞬間變 Em！',
+  'Am':   '💡 比 A 少按一根手指（無名指）——放開無名指，A 瞬間變 Am！',
+  'F':    '💡 E 指型往右移 1 格 + 食指橫按鎖 6 弦，初學者第一道牆！',
+  'F#m':  '💡 Em 指型往右移 2 格，食指橫按，J-pop 副歌必備！',
+  'Bm':   '💡 Am 指型往右移 2 格，食指加蓋——看到 Bm 腦中閃 Am！',
+  'Bm7':  '💡 Bm 放開無名指＋小指，只剩食指橫按＋中指，輕鬆版！',
+  'B':    '💡 A 指型往右移 2 格，中無小三指收攏一起按！',
+  'C#m7': '💡 Am 往右移 4 格封閉，和 Bm7 完全相同手型，Love Story 靈魂！',
+  'Dsus2':'💡 D 大調放開食指，只剩中指＋無名指——可與 D 隨時互換！',
+  'Esus4':'💡 比 E 把 ④③② 弦都往右移一格，鬆手就回到 E！',
+  'G':    '💡 E 指型開放等效版（往右移 3 格），小指撐住低音 E 弦 3fr！',
+  'B7':   '💡 以食指按 ④ 弦 1fr 為核心軸，其他三指環繞，記住中心點！',
+};
+
 /* ── State ── */
 let learned = JSON.parse(localStorage.getItem(LKEY) || '{}');
 let chordFilter = 'all';
+let cagedFilter = null;
 let curTab = 'home';
 
 function save(){ localStorage.setItem(LKEY, JSON.stringify(learned)); }
@@ -540,29 +618,50 @@ function renderHome(){
 function renderChords(){
   const types=['all','open','power','barre'];
   const typeLabel={all:'全部',open:'開放',power:'Power',barre:'封閉'};
-  const filtered=CHORDS.filter(c=>chordFilter==='all'||c.type===chordFilter);
+  const famIds=cagedFilter?new Set(CAGED_FAMILIES.find(f=>f.key===cagedFilter)?.members||[]):null;
+  const filtered=CHORDS.filter(c=>(chordFilter==='all'||c.type===chordFilter)&&(!famIds||famIds.has(c.id)));
+  const getFam=id=>CAGED_FAMILIES.find(f=>f.members.includes(id));
+  const activeFam=cagedFilter?CAGED_FAMILIES.find(f=>f.key===cagedFilter):null;
+  const banner=activeFam?`<div class="caged-banner show" style="background:${activeFam.color}14;border:1px solid ${activeFam.color}44;color:${activeFam.color}dd">🎸 ${activeFam.label}：${activeFam.insight}</div>`:'';
   document.getElementById('chord-view').innerHTML=`
     <div class="home-title">和弦記憶</div>
+    <div class="caged-tabs">
+      <button class="caged-tab" style="${!cagedFilter?'border-color:#e8c97a;color:#e8c97a;background:#2a1a00':''}" onclick="setCagedFilter(null)">全部</button>
+      ${CAGED_FAMILIES.map(f=>`<button class="caged-tab" style="${cagedFilter===f.key?`border-color:${f.color};color:${f.color};background:${f.color}1a`:''}" onclick="setCagedFilter('${f.key}')">${f.label}</button>`).join('')}
+    </div>
     <div class="chord-filters">
       ${types.map(t=>`<button class="chord-filter-btn${chordFilter===t?' active':''}" onclick="setFilter('${t}')">${typeLabel[t]}</button>`).join('')}
     </div>
+    ${banner}
     <div class="chord-grid">
-      ${filtered.map(c=>`
+      ${filtered.map(c=>{
+        const fam=getFam(c.id);
+        const famChip=fam?`<div class="fam-chip fam-chip-${fam.key}">${fam.chipLabel}</div>`:'';
+        const memTip=MEMORY_TIPS[c.id]?`<div class="c-memory-tip">${MEMORY_TIPS[c.id]}</div>`:'';
+        const proto=BARRE_PROTOTYPES[c.id];
+        const protoBtn=proto?`<button class="proto-btn" onclick="event.stopPropagation();showProto('${c.id}')">🔄 顯示原型</button>`:'';
+        return `
         <div class="c-card${isLearned(c.id)?' learned':''}" id="cc-${c.id}" onclick="flipChord('${c.id}')">
           <div class="c-inner">
             <div class="c-face">
+              ${famChip}
               <div class="c-name">${c.name}</div>
               <div class="c-type">${c.full}</div>
-              ${c.desc?`<div style="font-size:.72rem;color:#666;margin-top:8px;text-align:center">${c.desc}</div>`:''}
+              ${c.desc?`<div style="font-size:.72rem;color:#666;margin-top:6px;text-align:center">${c.desc}</div>`:''}
+              ${memTip}
             </div>
             <div class="c-back">
               <div class="c-diagram">${chordSVG(c,130)}</div>
-              <button class="c-chk-btn" onclick="markChord(event,'${c.id}')">
-                ${isLearned(c.id)?'✓ 已學會':'標記學會'}
-              </button>
+              <div style="display:flex;flex-direction:column;align-items:center;gap:5px;width:100%">
+                ${protoBtn}
+                <button class="c-chk-btn" onclick="markChord(event,'${c.id}')">
+                  ${isLearned(c.id)?'✓ 已學會':'標記學會'}
+                </button>
+              </div>
             </div>
           </div>
-        </div>`).join('')}
+        </div>`;
+      }).join('')}
     </div>
   `;
 }
@@ -570,6 +669,40 @@ function renderChords(){
 function flipChord(id){ document.getElementById('cc-'+id).classList.toggle('flipped'); }
 function markChord(e,id){ e.stopPropagation(); toggleLearned(id); renderChords(); renderSidebar(); }
 function setFilter(t){ chordFilter=t; renderChords(); }
+function setCagedFilter(key){ cagedFilter=key; renderChords(); }
+
+/* ── Prototype modal ── */
+function showProto(id){
+  const proto=BARRE_PROTOTYPES[id];
+  if(!proto) return;
+  const bc=CHORDS.find(c=>c.id===id);
+  const pc=CHORDS.find(c=>c.id===proto.protoId);
+  if(!bc||!pc) return;
+  document.getElementById('proto-content').innerHTML=`
+    <div class="proto-box-title">⚡ 物理平移推導：${bc.name}</div>
+    <div class="proto-row">
+      <div class="proto-side">
+        <div class="proto-side-name">${pc.name}</div>
+        ${chordSVG(pc,130)}
+        <div class="proto-side-lbl">開放把位原型</div>
+      </div>
+      <div class="proto-mid">
+        <div class="proto-mid-arrow">➜</div>
+        <div>往右平移</div>
+        <div style="font-size:1.2rem;font-weight:700;color:#e8c97a">+${proto.shift} 格</div>
+        <div>食指加蓋</div>
+      </div>
+      <div class="proto-side">
+        <div class="proto-side-name">${bc.name}</div>
+        ${chordSVG(bc,130)}
+        <div class="proto-side-lbl">${bc.startFret}fr 封閉</div>
+      </div>
+    </div>
+    <div class="proto-insight">${proto.insight}</div>
+  `;
+  document.getElementById('proto-overlay').classList.add('show');
+}
+function closeProto(){ document.getElementById('proto-overlay').classList.remove('show'); }
 
 /* ── Songs view ── */
 let curSong=null;
