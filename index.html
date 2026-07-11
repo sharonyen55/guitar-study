@@ -152,6 +152,46 @@ body{background:#0f0f0f;color:#e0e0e0;font-family:'Segoe UI',sans-serif;min-heig
 .proto-mid{display:flex;flex-direction:column;align-items:center;gap:2px;color:#5b8dd9;font-size:.72rem;text-align:center;padding:0 4px}
 .proto-mid-arrow{font-size:1.8rem;line-height:1}
 .proto-insight{margin-top:18px;font-size:.8rem;color:#aaa;line-height:1.7;background:#131313;border-radius:8px;padding:10px 14px;border-left:2px solid #5b8dd9}
+
+/* ── Ghost dots ── */
+@keyframes ghostBlink{0%,100%{fill:rgba(255,80,80,.12);stroke:rgba(255,80,80,.5)}50%{fill:rgba(255,80,80,.4);stroke:rgba(255,80,80,1)}}
+.chord-ghost{fill:none;stroke:rgba(255,80,80,0);stroke-dasharray:5,3;stroke-width:2.5}
+.c-card:hover .chord-ghost,.ghost-on .chord-ghost{animation:ghostBlink 1s ease-in-out infinite}
+.diff-msg{display:none;font-size:.65rem;color:#c84b4b;text-align:center;margin-top:4px;padding:0 6px;line-height:1.5}
+.c-card:hover .diff-msg{display:block}
+
+/* ── Train view ── */
+#train-view{display:none}
+.train-sec{background:#141414;border:1px solid #222;border-radius:12px;padding:20px;margin-bottom:18px}
+.train-sec-hd{font-size:.72rem;font-weight:700;color:#555;text-transform:uppercase;letter-spacing:.07em;margin-bottom:14px}
+
+/* ── Flashcard ── */
+.fc-wrap{background:#1a1a1a;border:1px solid #2a2a2a;border-radius:16px;padding:28px;text-align:center;display:flex;flex-direction:column;align-items:center;gap:14px;min-height:300px;justify-content:center}
+.fc-name{font-size:3rem;font-weight:800;color:#e8c97a;letter-spacing:.02em;line-height:1}
+.fc-full{font-size:.82rem;color:#555;margin-top:-6px}
+.fc-diagram{min-height:160px;display:flex;align-items:center;justify-content:center}
+@keyframes fcIn{from{opacity:0;transform:scale(.85)}to{opacity:1;transform:scale(1)}}
+.fc-diagram.revealed{animation:fcIn .35s ease}
+.fc-ctrls{display:flex;gap:10px;justify-content:center;flex-wrap:wrap}
+.fc-btn{padding:7px 18px;border:1px solid #333;border-radius:8px;font-size:.83rem;cursor:pointer;transition:all .2s;background:transparent;color:#888}
+.fc-btn:hover{border-color:#e8c97a;color:#e8c97a}
+.fc-btn-reveal{color:#5b8dd9;border-color:rgba(91,141,217,.5);background:rgba(91,141,217,.07)}
+.fc-btn-reveal:hover{background:rgba(91,141,217,.18);border-color:#5b8dd9;color:#5b8dd9}
+.fc-btn-got{color:#4caf7d;border-color:rgba(76,175,125,.5);background:rgba(76,175,125,.07)}
+.fc-btn-got:hover{background:rgba(76,175,125,.18);border-color:#4caf7d;color:#4caf7d}
+.fc-btn-miss{color:#c84b4b;border-color:rgba(200,75,75,.5);background:rgba(200,75,75,.07)}
+.fc-btn-miss:hover{background:rgba(200,75,75,.18);border-color:#c84b4b;color:#c84b4b}
+.fc-meta{display:flex;justify-content:space-between;align-items:center;width:100%;font-size:.75rem;color:#555}
+.fc-streak-n{color:#e8c97a;font-weight:700;font-size:1.1rem}
+
+/* ── Slide trainer ── */
+.slide-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(190px,1fr));gap:14px}
+.slide-card{background:#1a1a1a;border:1px solid #2a2a2a;border-radius:12px;padding:14px 12px;display:flex;flex-direction:column;align-items:center;gap:8px}
+.slide-card-name{font-size:1.05rem;font-weight:700;color:#e8c97a}
+.slide-card-sub{font-size:.65rem;color:#555}
+.slide-play-btn{width:100%;padding:5px 0;font-size:.73rem;color:#d9955b;background:rgba(217,149,91,.07);border:1px solid rgba(217,149,91,.3);border-radius:10px;cursor:pointer;transition:all .15s}
+.slide-play-btn:hover:not(:disabled){background:rgba(217,149,91,.18);border-color:#d9955b}
+.slide-play-btn:disabled{opacity:.35;cursor:default}
 </style>
 </head>
 <body>
@@ -177,6 +217,9 @@ body{background:#0f0f0f;color:#e0e0e0;font-family:'Segoe UI',sans-serif;min-heig
       <button class="nav-item" id="nav-songs" onclick="switchTab('songs')">
         <span class="nav-icon">📄</span>歌譜
       </button>
+      <button class="nav-item" id="nav-train" onclick="switchTab('train')">
+        <span class="nav-icon">💪</span>肌肉記憶特訓
+      </button>
     </div>
     <div id="song-list" style="display:none"></div>
   </div>
@@ -187,12 +230,14 @@ body{background:#0f0f0f;color:#e0e0e0;font-family:'Segoe UI',sans-serif;min-heig
   <div id="home-view"></div>
   <div id="chord-view"></div>
   <div id="song-view"></div>
+  <div id="train-view"></div>
 </div>
 
 <!-- Chord popup -->
 <div class="chord-popup" id="chord-popup" onclick="closePopup()">
   <div class="chord-popup-name" id="popup-name"></div>
   <div id="popup-diagram"></div>
+  <div id="popup-diff" style="font-size:.7rem;color:#c84b4b;text-align:center;padding:0 8px;display:none"></div>
   <button class="popup-learn-btn" id="popup-learn-btn" onclick="event.stopPropagation();handleLearnToggle()"></button>
 </div>
 
@@ -481,6 +526,14 @@ const MEMORY_TIPS = {
   'B7':   '💡 以食指按 ④ 弦 1fr 為核心軸，其他三指環繞，記住中心點！',
 };
 
+const DIFF_HINTS = {
+  'Em':   { ghosts:[{str:2,fret:1}], msg:'放開中指（③弦1格），E 就變 Em！' },
+  'Am':   { ghosts:[{str:1,fret:2}], msg:'放開食指（②弦2格），A 就變 Am！' },
+  'Bm7':  { ghosts:[{str:2,fret:4},{str:0,fret:4}], msg:'放開③弦小指＋①弦，Bm 就變 Bm7！' },
+  'Dsus2':{ ghosts:[{str:1,fret:3}], msg:'放開②弦3格無名指（變空弦），D 就變 Dsus2！' },
+  'Esus4':{ ghosts:[{str:2,fret:1}], msg:'③弦從1格→2格壓，E 就懸浮了！' },
+};
+
 /* ── State ── */
 let learned = JSON.parse(localStorage.getItem(LKEY) || '{}');
 let chordFilter = 'all';
@@ -495,7 +548,7 @@ function toggleLearned(id){
 }
 
 /* ── SVG chord diagram ── */
-function chordSVG(ch, size=120){
+function chordSVG(ch, size=120, opts={}){
   const sw=size, sh=size+20;
   const ml=24,mr=10,mt=24,mb=10;
   const fw=sw-ml-mr, fh=sh-mt-mb;
@@ -536,7 +589,30 @@ function chordSVG(ch, size=120){
   }
   if(ch.startFret>1)
     svg+=`<text x="${ml+fw+6}" y="${mt+fretH*.6}" fill="#888" font-size="11">${ch.startFret}fr</text>`;
+  if(opts.ghosts)(opts.ghosts).forEach(g=>{
+    const relFret=g.fret-ch.startFret+1;
+    if(relFret<1||relFret>4)return;
+    const gx=ml+(5-g.str)*strW, gy=mt+(relFret-.5)*fretH;
+    svg+=`<circle class="chord-ghost" cx="${gx}" cy="${gy}" r="${fretH*.38}"/>`;
+  });
   return svg+'</svg>';
+}
+
+function chordSVGBlank(size=140){
+  const sw=size,sh=size+20,ml=24,mr=10,mt=24,mb=10;
+  const fw=sw-ml-mr,fh=sh-mt-mb,strW=fw/5,fretH=fh/4;
+  let svg=`<svg width="${sw}" height="${sh}" xmlns="http://www.w3.org/2000/svg">`;
+  for(let f=0;f<=4;f++){const y=mt+f*fretH;svg+=`<line x1="${ml}" y1="${y}" x2="${ml+fw}" y2="${y}" stroke="#2e2e2e" stroke-width="${f===0?2.5:1}"/>`;}
+  for(let s=0;s<6;s++){const x=ml+s*strW;svg+=`<line x1="${x}" y1="${mt}" x2="${x}" y2="${mt+fh}" stroke="#2e2e2e" stroke-width="1"/>`;}
+  return svg+'</svg>';
+}
+
+function chordSVGShifted(ch, dispFret){
+  const d=ch.startFret-dispFret;
+  const sc={...ch,startFret:Math.max(1,dispFret),
+    strings:ch.strings.map(s=>s===null?null:(s===0?0:Math.max(0,s-d))),
+    barre:ch.barre?{...ch.barre,fret:Math.max(1,ch.barre.fret-d)}:null};
+  return chordSVG(sc,130);
 }
 
 /* ── Sidebar toggle ── */
@@ -547,16 +623,18 @@ function toggleSidebar(){
 /* ── Tab switching ── */
 function switchTab(t){
   curTab=t;
-  ['chord','songs'].forEach(id=>{
+  ['chord','songs','train'].forEach(id=>{
     document.getElementById('nav-'+id)?.classList.toggle('active', id===t);
   });
-  document.getElementById('home-view').style.display  = t==='home'   ? 'block' : 'none';
-  document.getElementById('chord-view').style.display = t==='chord'  ? 'block' : 'none';
-  document.getElementById('song-view').style.display  = t==='songs'  ? 'block' : 'none';
-  document.getElementById('song-list').style.display  = t==='songs'  ? 'block' : 'none';
+  document.getElementById('home-view').style.display  = t==='home'  ?'block':'none';
+  document.getElementById('chord-view').style.display = t==='chord' ?'block':'none';
+  document.getElementById('song-view').style.display  = t==='songs' ?'block':'none';
+  document.getElementById('train-view').style.display = t==='train' ?'block':'none';
+  document.getElementById('song-list').style.display  = t==='songs' ?'block':'none';
   if(t==='home')  { curSong=null; renderHome(); }
   if(t==='chord') renderChords();
   if(t==='songs') renderSongList();
+  if(t==='train') renderTrain();
   renderSidebar();
 }
 
@@ -638,6 +716,8 @@ function renderChords(){
         const fam=getFam(c.id);
         const famChip=fam?`<div class="fam-chip fam-chip-${fam.key}">${fam.chipLabel}</div>`:'';
         const memTip=MEMORY_TIPS[c.id]?`<div class="c-memory-tip">${MEMORY_TIPS[c.id]}</div>`:'';
+        const diff=DIFF_HINTS[c.id];
+        const diffMsg=diff?`<div class="diff-msg">👆 ${diff.msg}</div>`:'';
         const proto=BARRE_PROTOTYPES[c.id];
         const protoBtn=proto?`<button class="proto-btn" onclick="event.stopPropagation();showProto('${c.id}')">🔄 顯示原型</button>`:'';
         return `
@@ -649,9 +729,10 @@ function renderChords(){
               <div class="c-type">${c.full}</div>
               ${c.desc?`<div style="font-size:.72rem;color:#666;margin-top:6px;text-align:center">${c.desc}</div>`:''}
               ${memTip}
+              ${diffMsg}
             </div>
             <div class="c-back">
-              <div class="c-diagram">${chordSVG(c,130)}</div>
+              <div class="c-diagram">${chordSVG(c,130,{ghosts:diff?.ghosts})}</div>
               <div style="display:flex;flex-direction:column;align-items:center;gap:5px;width:100%">
                 ${protoBtn}
                 <button class="c-chk-btn" onclick="markChord(event,'${c.id}')">
@@ -803,6 +884,120 @@ function renderSheet(sheet){
   }).join('');
 }
 
+/* ── Flashcard ── */
+let fc={chord:null,revealed:false,streak:0,hits:0,total:0,started:false};
+
+function fcStart(){ fc.started=true; fcNext(); }
+function fcNext(){
+  const pool=CHORDS.filter(c=>c.type!=='power');
+  fc.chord=pool[Math.floor(Math.random()*pool.length)];
+  fc.revealed=false;
+  renderFCCard();
+}
+function fcReveal(){ fc.revealed=true; fc.total++; renderFCCard(); }
+function fcGot(){ fc.hits++; fc.streak++; fcNext(); }
+function fcMiss(){ fc.streak=0; fcNext(); }
+
+function renderFCCard(){
+  const area=document.getElementById('fc-area');
+  if(!area) return;
+  if(!fc.started||!fc.chord){
+    area.innerHTML=`<div class="fc-wrap">
+      <div style="font-size:2.5rem">🃏</div>
+      <div style="font-size:1.1rem;font-weight:600;color:#ccc">快閃字卡 · 盲背挑戰</div>
+      <div style="font-size:.82rem;color:#555;text-align:center">系統隨機顯示和弦名稱<br>你要在腦中默想左手按法<br>再點「看答案」驗證</div>
+      <button class="fc-btn fc-btn-reveal" style="font-size:.95rem;padding:10px 28px" onclick="fcStart()">🎯 開始挑戰</button>
+    </div>`;
+    return;
+  }
+  const c=fc.chord;
+  const acc=fc.total?Math.round(fc.hits/fc.total*100):'--';
+  area.innerHTML=`<div class="fc-wrap">
+    <div class="fc-name">${c.name}</div>
+    <div class="fc-full">${c.full}</div>
+    ${fc.revealed?`
+      <div class="fc-diagram revealed ghost-on">${chordSVG(c,150,{ghosts:DIFF_HINTS[c.id]?.ghosts})}</div>
+      ${DIFF_HINTS[c.id]?`<div style="font-size:.7rem;color:#c84b4b;margin-top:-6px">👆 ${DIFF_HINTS[c.id].msg}</div>`:''}
+      <div class="fc-ctrls">
+        <button class="fc-btn fc-btn-got" onclick="fcGot()">✅ 記住了</button>
+        <button class="fc-btn fc-btn-miss" onclick="fcMiss()">🔄 再練</button>
+      </div>`:`
+      <div class="fc-diagram">${chordSVGBlank(150)}</div>
+      <div style="font-size:.75rem;color:#333">默想左手按法後點「看答案」</div>
+      <div class="fc-ctrls">
+        <button class="fc-btn fc-btn-reveal" onclick="fcReveal()">👁 看答案</button>
+        <button class="fc-btn" onclick="fcNext()">⏭ 跳過</button>
+      </div>`}
+    <div class="fc-meta">
+      <div>🔥 連續 <span class="fc-streak-n">${fc.streak}</span></div>
+      <div>${fc.total} 題 · 正確率 ${fc.total?acc+'%':'--'}</div>
+    </div>
+  </div>`;
+}
+
+/* ── Slide trainer ── */
+const _sa={};
+function playSlide(id){
+  if(_sa[id]) return;
+  const bc=CHORDS.find(c=>c.id===id);
+  const proto=BARRE_PROTOTYPES[id];
+  if(!bc||!proto) return;
+  const el=document.getElementById('sc-'+id);
+  const btn=document.getElementById('sb-'+id);
+  if(!el||!btn) return;
+  _sa[id]=true; btn.disabled=true; btn.textContent='◼ 播放中…';
+  const shift=proto.shift, FPF=8, MS=50, total=shift*FPF;
+  let f=0;
+  const ph1=setInterval(()=>{
+    f++;
+    el.innerHTML=chordSVGShifted(bc,Math.max(1,Math.round(bc.startFret-shift*(f/total))));
+    if(f>=total){
+      clearInterval(ph1);
+      setTimeout(()=>{
+        let f2=0;
+        const ph2=setInterval(()=>{
+          f2++;
+          el.innerHTML=chordSVGShifted(bc,Math.round(Math.max(1,bc.startFret-shift)+shift*(f2/total)));
+          if(f2>=total){
+            clearInterval(ph2);
+            el.innerHTML=chordSVG(bc,130);
+            _sa[id]=false; btn.disabled=false; btn.textContent='▶ 播放平移動畫';
+          }
+        },MS);
+      },600);
+    }
+  },MS);
+}
+
+function renderSlideGrid(){
+  return `<div class="slide-grid">${CHORDS.filter(c=>BARRE_PROTOTYPES[c.id]).map(c=>{
+    const p=BARRE_PROTOTYPES[c.id];
+    const pc=CHORDS.find(x=>x.id===p.protoId);
+    return `<div class="slide-card">
+      <div class="slide-card-name">${c.name}</div>
+      <div class="slide-card-sub">${pc?pc.name:'?'} → 右移 +${p.shift} 格</div>
+      <div id="sc-${c.id}">${chordSVG(c,130)}</div>
+      <button class="slide-play-btn" id="sb-${c.id}" onclick="playSlide('${c.id}')">▶ 播放平移動畫</button>
+    </div>`;
+  }).join('')}</div>`;
+}
+
+function renderTrain(){
+  document.getElementById('train-view').innerHTML=`
+    <div class="home-title">💪 肌肉記憶特訓</div>
+    <div class="train-sec">
+      <div class="train-sec-hd">⚡ 快閃字卡 · Active Recall 盲背測驗</div>
+      <div id="fc-area"></div>
+    </div>
+    <div class="train-sec">
+      <div class="train-sec-hd">🎸 平移動畫 · 封閉和弦指型平移特訓</div>
+      <p style="font-size:.8rem;color:#555;margin-bottom:14px">點擊播放，觀察指型如何從開放把位平移到封閉位置</p>
+      ${renderSlideGrid()}
+    </div>
+  `;
+  renderFCCard();
+}
+
 /* ── Chord popup ── */
 let popupCurId=null;
 function showPopup(id,e){
@@ -812,7 +1007,10 @@ function showPopup(id,e){
   popupCurId=id;
   const pop=document.getElementById('chord-popup');
   document.getElementById('popup-name').textContent=`${ch.name}（${ch.full}）`;
-  document.getElementById('popup-diagram').innerHTML=chordSVG(ch,150);
+  const diffH=DIFF_HINTS[id];
+  document.getElementById('popup-diagram').innerHTML=`<div class="${diffH?'ghost-on':''}">${chordSVG(ch,150,{ghosts:diffH?.ghosts})}</div>`;
+  const diffEl=document.getElementById('popup-diff');
+  if(diffEl){ diffEl.style.display=diffH?'':'none'; if(diffH) diffEl.textContent='👆 '+diffH.msg; }
   updatePopupLearnBtn();
   pop.style.left=Math.min(e.clientX-80,window.innerWidth-200)+'px';
   pop.style.top=(e.clientY+12)+'px';
