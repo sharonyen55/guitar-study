@@ -297,65 +297,47 @@ const LKEY = 'guitar_v1';
  */
 /* ── Chord data ── */
 const CHORDS = [
-  {id:"Em", name:"Em", full:"E minor", type:"open",
-   strings:[0,0,0,2,2,0], fingers:[null,null,null,2,1,null], startFret:1, desc:"最常見的入門和弦"},
-
-  {id:"Am", name:"Am", full:"A minor", type:"open",
-   strings:[0,1,2,2,0,null], fingers:[null,1,3,2,null,null], startFret:1, desc:"民謠必備，轉位簡單"},
-
-  {id:"E",  name:"E",  full:"E major", type:"open",
-   strings:[0,0,1,2,2,0], fingers:[null,null,1,3,2,null], startFret:1, desc:"經典大調和弦"},
-
-  {id:"A",  name:"A",  full:"A major", type:"open",
-   strings:[0,2,2,2,0,null], fingers:[null,3,2,1,null,null], startFret:1, desc:"常規舒適配置指法"},
-
-  {id:"D",  name:"D",  full:"D major", type:"open",
-   strings:[2,3,2,0,null,null], fingers:[2,3,1,null,null,null], startFret:1, desc:"開放把位核心大調"},
-
-  {id:"G",  name:"G",  full:"G major", type:"open",
-   strings:[3,0,0,0,2,3], fingers:[4,null,null,null,1,3], startFret:1, desc:"手指跨度較大，多練習"},
-
-  {id:"C",  name:"C",  full:"C major", type:"open",
-   strings:[0,1,0,2,3,null], fingers:[null,1,null,2,3,null], startFret:1, desc:"萬用流行進行骨架"},
-
-  {id:"Dm", name:"Dm", full:"D minor", type:"open",
-   strings:[1,3,2,0,null,null], fingers:[1,3,2,null,null,null], startFret:1, desc:"憂鬱小調色彩"},
-
-  {id:"B7", name:"B7", full:"B dominant 7", type:"open",
-   strings:[2,0,2,1,2,null], fingers:[4,null,3,1,2,null], startFret:1, desc:"過門常用七和弦"},
-
-  {id:"F",  name:"F",  full:"F major", type:"barre",
-   strings:[1,1,2,3,3,1], barre:{fret:1,from:1,to:6}, fingers:[1,1,2,4,3,1], startFret:1, desc:"初學最難的封閉和弦"},
-
-  {id:"Bm", name:"Bm", full:"B minor", type:"barre",
-   strings:[2,3,4,4,2,null], barre:{fret:2,from:1,to:5}, fingers:[1,2,4,3,1,null], startFret:2, desc:"二把位標準小調封閉"},
-
-  {id:"Dsus2", name:"Dsus2", full:"D suspended 2", type:"open",
-   strings:[0,3,2,0,null,null], fingers:[null,3,2,null,null,null], startFret:1, desc:"更方便與 D 和弦互換的 3,2 指法"},
-
-  {id:"Bm7", name:"Bm7", full:"B minor 7", type:"barre",
-   strings:[2,3,2,4,2,null], barre:{fret:2,from:1,to:5}, fingers:[null,2,null,4,null,null], startFret:2, desc:"電吉他實用食指小橫按"},
-
-  {id:"B", name:"B", full:"B major", type:"barre",
-   strings:[2,4,4,4,2,null], barre:{fret:2,from:1,to:5}, fingers:[null,4,3,2,null,null], startFret:2, desc:"標準五弦根音大調封閉"},
-
-  {id:"C#m7", name:"C#m7", full:"C# minor 7", type:"barre",
-   strings:[4,5,4,6,4,null], barre:{fret:4,from:1,to:5}, fingers:[null,2,null,4,null,null], startFret:4, desc:"Love Story 轉調靈魂和弦"},
-
-  {id:"E5", name:"E5", full:"E power", type:"power",
-   strings:[null,null,null,9,7,0], fingers:[null,null,null,3,1,null], startFret:7, desc:"電吉他最基本的高把位 power chord"},
-
-  {id:"A5", name:"A5", full:"A power", type:"power",
+  {id:"Em",    difficulty:1, name:"Em",    full:"E minor",         type:"open",
+   strings:[0,0,0,2,2,0],       fingers:[null,null,null,2,1,null],    startFret:1, desc:"最常見的入門和弦"},
+  {id:"Am",    difficulty:1, name:"Am",    full:"A minor",         type:"open",
+   strings:[0,1,2,2,0,null],    fingers:[null,1,3,2,null,null],       startFret:1, desc:"民謠必備，轉位簡單"},
+  {id:"E",     difficulty:2, name:"E",     full:"E major",         type:"open",
+   strings:[0,0,1,2,2,0],       fingers:[null,null,1,3,2,null],       startFret:1, desc:"經典大調和弦"},
+  {id:"A",     difficulty:2, name:"A",     full:"A major",         type:"open",
+   strings:[0,2,2,2,0,null],    fingers:[null,3,2,1,null,null],       startFret:1, desc:"常規舒適配置指法"},
+  {id:"D",     difficulty:2, name:"D",     full:"D major",         type:"open",
+   strings:[2,3,2,0,null,null], fingers:[2,3,1,null,null,null],       startFret:1, desc:"開放把位核心大調"},
+  {id:"G",     difficulty:2, name:"G",     full:"G major",         type:"open",
+   strings:[3,0,0,0,2,3],       fingers:[4,null,null,null,1,3],       startFret:1, desc:"手指跨度較大，多練習"},
+  {id:"C",     difficulty:2, name:"C",     full:"C major",         type:"open",
+   strings:[0,1,0,2,3,null],    fingers:[null,1,null,2,3,null],       startFret:1, desc:"萬用流行進行骨架"},
+  {id:"Dm",    difficulty:2, name:"Dm",    full:"D minor",         type:"open",
+   strings:[1,3,2,0,null,null], fingers:[1,3,2,null,null,null],       startFret:1, desc:"憂鬱小調色彩"},
+  {id:"A5",    difficulty:3, name:"A5",    full:"A power",         type:"power",
    strings:[null,null,2,2,0,null], fingers:[null,null,3,1,null,null], startFret:1, desc:"最威猛的 1,3 指法強力和弦體系"},
-
-  {id:"D5", name:"D5", full:"D power", type:"power",
-   strings:[null,null,7,7,5,null], fingers:[null,null,4,3,1,null], startFret:5, desc:"電吉他副歌萬用強力和弦"},
-
-  {id:"F#m", type:"barre", strings:[2,2,2,4,4,2], barre:{fret:2,from:1,to:6}, fingers:[null,null,null,4,3,null], startFret:2,
+  {id:"E5",    difficulty:3, name:"E5",    full:"E power",         type:"power",
+   strings:[null,null,null,9,7,0], fingers:[null,null,null,3,1,null], startFret:7, desc:"電吉他最基本的高把位 power chord"},
+  {id:"D5",    difficulty:3, name:"D5",    full:"D power",         type:"power",
+   strings:[null,null,7,7,5,null], fingers:[null,null,4,3,1,null],    startFret:5, desc:"電吉他副歌萬用強力和弦"},
+  {id:"Dsus2", difficulty:3, name:"Dsus2", full:"D suspended 2",   type:"open",
+   strings:[0,3,2,0,null,null], fingers:[null,3,2,null,null,null],    startFret:1, desc:"更方便與 D 和弦互換的 3,2 指法"},
+  {id:"Esus4", difficulty:3, name:"Esus4", full:"E suspended 4th", type:"open",
+   strings:[0,0,2,2,2,0],       fingers:[null,null,3,2,1,null],       startFret:1, desc:"A/D/G 弦同時按 2fr，開放弦帶飄浮感"},
+  {id:"B7",    difficulty:3, name:"B7",    full:"B dominant 7",    type:"open",
+   strings:[2,0,2,1,2,null],    fingers:[4,null,3,1,2,null],          startFret:1, desc:"過門常用七和弦"},
+  {id:"F",     difficulty:4, name:"F",     full:"F major",         type:"barre",
+   strings:[1,1,2,3,3,1],       barre:{fret:1,from:1,to:6},           fingers:[1,1,2,4,3,1], startFret:1, desc:"初學最難的封閉和弦"},
+  {id:"Bm",    difficulty:4, name:"Bm",    full:"B minor",         type:"barre",
+   strings:[2,3,4,4,2,null],    barre:{fret:2,from:1,to:5},           fingers:[1,2,4,3,1,null], startFret:2, desc:"二把位標準小調封閉"},
+  {id:"Bm7",   difficulty:4, name:"Bm7",   full:"B minor 7",       type:"barre",
+   strings:[2,3,2,4,2,null],    barre:{fret:2,from:1,to:5},           fingers:[null,2,null,4,null,null], startFret:2, desc:"電吉他實用食指小橫按"},
+  {id:"B",     difficulty:4, name:"B",     full:"B major",         type:"barre",
+   strings:[2,4,4,4,2,null],    barre:{fret:2,from:1,to:5},           fingers:[null,4,3,2,null,null], startFret:2, desc:"標準五弦根音大調封閉"},
+  {id:"F#m",   difficulty:5, type:"barre",
+   strings:[2,2,2,4,4,2],       barre:{fret:2,from:1,to:6},           fingers:[null,null,null,4,3,null], startFret:2,
    name:"F♯m", full:"F sharp minor", desc:"Em 形封閉和弦，2fr 全按，J-pop 必備"},
-
-  {id:"Esus4", type:"open", strings:[0,0,2,2,2,0], fingers:[null,null,3,2,1,null], startFret:1,
-   name:"Esus4", full:"E suspended 4th", desc:"A/D/G 弦同時按 2fr，開放弦帶飄浮感"},
+  {id:"C#m7",  difficulty:5, name:"C#m7",  full:"C# minor 7",      type:"barre",
+   strings:[4,5,4,6,4,null],    barre:{fret:4,from:1,to:5},           fingers:[null,2,null,4,null,null], startFret:4, desc:"Love Story 轉調靈魂和弦"},
 ];
 
 /* ── Intro TAB SVG ── */
@@ -570,10 +552,19 @@ const DIFF_HINTS = {
   'Esus4':{ ghosts:[{str:2,fret:1}], msg:'③弦從1格→2格壓，E 就懸浮了！' },
 };
 
+const DIFFICULTY_LABELS = {
+  1:{label:'入門',    color:'#4caf7d'},
+  2:{label:'基礎',    color:'#5b8dd9'},
+  3:{label:'進階開放',color:'#e8c97a'},
+  4:{label:'封閉基礎',color:'#d9955b'},
+  5:{label:'封閉進階',color:'#c84b4b'},
+};
+
 /* ── State ── */
 let learned = JSON.parse(localStorage.getItem(LKEY) || '{}');
 let chordFilter = 'all';
 let cagedFilter = null;
+let chordSort = 'difficulty';
 let curTab = 'home';
 
 function save(){ localStorage.setItem(LKEY, JSON.stringify(learned)); }
@@ -734,7 +725,8 @@ function renderChords(){
   const types=['all','open','power','barre'];
   const typeLabel={all:'全部',open:'開放',power:'Power',barre:'封閉'};
   const famIds=cagedFilter?new Set(CAGED_FAMILIES.find(f=>f.key===cagedFilter)?.members||[]):null;
-  const filtered=CHORDS.filter(c=>(chordFilter==='all'||c.type===chordFilter)&&(!famIds||famIds.has(c.id)));
+  let filtered=CHORDS.filter(c=>(chordFilter==='all'||c.type===chordFilter)&&(!famIds||famIds.has(c.id)));
+  if(chordSort==='difficulty') filtered=[...filtered].sort((a,b)=>(a.difficulty||9)-(b.difficulty||9));
   const getFam=id=>CAGED_FAMILIES.find(f=>f.members.includes(id));
   const activeFam=cagedFilter?CAGED_FAMILIES.find(f=>f.key===cagedFilter):null;
   const banner=activeFam?`<div class="caged-banner show" style="background:${activeFam.color}14;border:1px solid ${activeFam.color}44;color:${activeFam.color}dd">🎸 ${activeFam.label}：${activeFam.insight}</div>`:'';
@@ -744,14 +736,19 @@ function renderChords(){
       <button class="caged-tab" style="${!cagedFilter?'border-color:#e8c97a;color:#e8c97a;background:#2a1a00':''}" onclick="setCagedFilter(null)">全部</button>
       ${CAGED_FAMILIES.map(f=>`<button class="caged-tab" style="${cagedFilter===f.key?`border-color:${f.color};color:${f.color};background:${f.color}1a`:''}" onclick="setCagedFilter('${f.key}')">${f.label}</button>`).join('')}
     </div>
-    <div class="chord-filters">
+    <div class="chord-filters" style="display:flex;align-items:center;gap:8px;flex-wrap:wrap">
       ${types.map(t=>`<button class="chord-filter-btn${chordFilter===t?' active':''}" onclick="setFilter('${t}')">${typeLabel[t]}</button>`).join('')}
+      <div style="flex:1"></div>
+      <button class="chord-filter-btn${chordSort==='difficulty'?' active':''}" onclick="setChordSort('difficulty')" title="由簡到難排列">⬆ 難度排序</button>
+      <button class="chord-filter-btn${chordSort==='default'?' active':''}" onclick="setChordSort('default')" title="依新增順序">預設順序</button>
     </div>
     ${banner}
     <div class="chord-grid">
       ${filtered.map(c=>{
         const fam=getFam(c.id);
         const famChip=fam?`<div class="fam-chip fam-chip-${fam.key}">${fam.chipLabel}</div>`:'';
+        const dl=DIFFICULTY_LABELS[c.difficulty];
+        const diffChip=dl?`<div style="font-size:.58rem;font-weight:700;letter-spacing:.04em;padding:1px 7px;border-radius:8px;margin-bottom:3px;background:${dl.color}18;color:${dl.color};border:1px solid ${dl.color}44">${dl.label}</div>`:'';
         const memTip=MEMORY_TIPS[c.id]?`<div class="c-memory-tip">${MEMORY_TIPS[c.id]}</div>`:'';
         const diff=DIFF_HINTS[c.id];
         const diffMsg=diff?`<div class="diff-msg">👆 ${diff.msg}</div>`:'';
@@ -761,7 +758,9 @@ function renderChords(){
         <div class="c-card${isLearned(c.id)?' learned':''}" id="cc-${c.id}" onclick="flipChord('${c.id}')">
           <div class="c-inner">
             <div class="c-face">
-              ${famChip}
+              <div style="display:flex;gap:4px;align-items:center;flex-wrap:wrap;justify-content:center">
+                ${diffChip}${famChip}
+              </div>
               <div class="c-name">${c.name}</div>
               <div class="c-type">${c.full}</div>
               ${c.desc?`<div style="font-size:.72rem;color:#666;margin-top:6px;text-align:center">${c.desc}</div>`:''}
@@ -783,6 +782,7 @@ function renderChords(){
     </div>
   `;
 }
+function setChordSort(s){ chordSort=s; renderChords(); }
 
 function flipChord(id){ document.getElementById('cc-'+id).classList.toggle('flipped'); }
 function markChord(e,id){ e.stopPropagation(); toggleLearned(id); renderChords(); renderSidebar(); }
