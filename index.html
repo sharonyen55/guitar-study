@@ -547,7 +547,7 @@ const MEMORY_TIPS = {
   'F':    '💡 E 指型往右移 1 格 + 食指橫按鎖 6 弦，初學者第一道牆！',
   'F#m':  '💡 Em 指型往右移 2 格，食指橫按，J-pop 副歌必備！',
   'Bm':   '💡 Am 指型往右移 2 格，食指加蓋——看到 Bm 腦中閃 Am！',
-  'Bm7':  '💡 Bm 放開無名指＋小指，只剩食指橫按＋中指，輕鬆版！',
+  'Bm7':  '💡 電吉他實用小橫按：比標準 Bm 封閉「放開原本在第 ③ 弦的小指」讓食指大橫壓透過去，並順手用小指（4）穩穩壓住第 ④ 弦第 4 格！',
   'B':    '💡 A 指型往右移 2 格，中無小三指收攏一起按！',
   'C#m7': '💡 Am 往右移 4 格封閉，和 Bm7 完全相同手型，Love Story 靈魂！',
   'Dsus2':'💡 D 大調放開食指，只剩中指＋無名指——可與 D 隨時互換！',
@@ -559,11 +559,11 @@ const MEMORY_TIPS = {
 };
 
 const DIFF_HINTS = {
-  'Em':   { ghosts:[{str:2,fret:1}], msg:'放開中指（③弦1格），E 就變 Em！' },
-  'Am':   { ghosts:[{str:1,fret:2}], msg:'放開食指（②弦2格），A 就變 Am！' },
-  'Bm7':  { ghosts:[{str:2,fret:4},{str:0,fret:4}], msg:'放開③弦小指＋①弦，Bm 就變 Bm7！' },
-  'Dsus2':{ ghosts:[{str:1,fret:3}], msg:'放開②弦3格無名指（變空弦），D 就變 Dsus2！' },
-  'Esus4':{ ghosts:[{str:2,fret:1}], msg:'③弦從1格→2格壓，E 就懸浮了！' },
+  'Em':   { compareWith:'E',   ghosts:[{str:2,fret:1}],              text:'放開中指（③弦1格），E 就變 Em！' },
+  'Am':   { compareWith:'A',   targetString:3, fretOffset:-1, ghosts:[{str:1,fret:2}], text:'💡 骨架減法：將 A 和弦在第 ③ 弦的無名指（3）往左移一格（或換成食指按②弦），就變成憂鬱的 Am 囉！' },
+  'Bm7':  { compareWith:'Bm',  ghosts:[{str:2,fret:4},{str:0,fret:4}], text:'放開③弦小指＋①弦，Bm 就變 Bm7！' },
+  'Dsus2':{ compareWith:'D',   targetString:2, ghosts:[{str:1,fret:3}], text:'放開②弦3格無名指（變空弦），D 就變 Dsus2！' },
+  'Esus4':{ compareWith:'E',   targetString:3, ghosts:[{str:2,fret:1}], text:'③弦從1格→2格壓，E 就懸浮了！' },
 };
 
 const DIFFICULTY_LABELS = {
@@ -763,7 +763,7 @@ function renderChords(){
         const diffChip=dl?`<div style="font-size:.72rem;color:#e8c97a;letter-spacing:1px;margin-bottom:2px">${'★'.repeat(c.difficulty)}</div>`:'';
         const memTip=MEMORY_TIPS[c.id]?`<div class="c-memory-tip">${MEMORY_TIPS[c.id]}</div>`:'';
         const diff=DIFF_HINTS[c.id];
-        const diffMsg=diff?`<div class="diff-msg">👆 ${diff.msg}</div>`:'';
+        const diffMsg=diff?`<div class="diff-msg">👆 ${diff.text}</div>`:'';
         const proto=BARRE_PROTOTYPES[c.id];
         const protoBtn=proto?`<button class="proto-btn" onclick="event.stopPropagation();showProto('${c.id}')">🔍 顯示原型</button>`:'';
         return `
@@ -1025,7 +1025,7 @@ function renderFCCard(){
     <div class="fc-full">${c.full}</div>
     ${fc.revealed?`
       <div class="fc-diagram revealed ghost-on">${chordSVG(c,150,{ghosts:DIFF_HINTS[c.id]?.ghosts})}</div>
-      ${DIFF_HINTS[c.id]?`<div style="font-size:.7rem;color:#c84b4b;margin-top:-6px">👆 ${DIFF_HINTS[c.id].msg}</div>`:''}
+      ${DIFF_HINTS[c.id]?`<div style="font-size:.7rem;color:#c84b4b;margin-top:-6px">👆 ${DIFF_HINTS[c.id].text}</div>`:''}
       <div class="fc-ctrls">
         <button class="fc-btn fc-btn-got" onclick="fcGot()">✅ 記住了</button>
         <button class="fc-btn fc-btn-miss" onclick="fcMiss()">🔄 再練</button>
