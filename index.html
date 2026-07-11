@@ -338,6 +338,10 @@ const CHORDS = [
    name:"F♯m", full:"F sharp minor", desc:"Em 形封閉和弦，2fr 全按，J-pop 必備"},
   {id:"C#m7",  difficulty:5, name:"C#m7",  full:"C# minor 7",      type:"barre",
    strings:[4,5,4,6,4,null],    barre:{fret:4,from:1,to:5},           fingers:[null,2,null,4,null,null], startFret:4, desc:"Love Story 轉調靈魂和弦"},
+  {id:"Gadd9", difficulty:2, name:"Gadd9", full:"G add 9",          type:"open",
+   strings:[3,3,0,0,2,3],       fingers:[4,3,null,null,1,2],          startFret:1, desc:"G 加 9th，J-pop 流行最愛，飄浮又溫暖"},
+  {id:"Cadd9", difficulty:3, name:"Cadd9", full:"C add 9",          type:"open",
+   strings:[3,3,0,2,3,null],    fingers:[3,4,null,2,3,null],          startFret:1, desc:"C 加 9th，Cadd9 ↔ G 是流行進行絕配"},
 ];
 
 /* ── Intro TAB SVG ── */
@@ -511,12 +515,18 @@ const SONGS = [
 
 /* ── CAGED Memory System ── */
 const CAGED_FAMILIES = [
-  { key:'E', label:'E 骨架家族', chipLabel:'E 骨架', color:'#5b8dd9',
-    members:['E','Em','F','F#m','G'],
-    insight:'E / Em 指型平移：F = E 往右 1 格，F♯m = Em 往右 2 格，G = E 往右 3 格（開放版）。看到任何一個，腦中先浮現 E 指型！' },
+  { key:'C', label:'C 骨架家族', chipLabel:'C 骨架', color:'#d94f5b',
+    members:['C','Cadd9'],
+    insight:'C 指型：無名⑤弦3格、中指④弦2格、食指②弦1格。Cadd9 = 無名指蓋住①弦、拿掉食指，空弦 D 帶來 add9 的飄浮感。C ↔ Cadd9 隨時互換，是流行進行的靈魂搭檔！' },
   { key:'A', label:'A 骨架家族', chipLabel:'A 骨架', color:'#d9955b',
     members:['A','Am','B','Bm','Bm7','C#m7'],
     insight:'A / Am 指型平移：B = A 往右 2 格，Bm / Bm7 = Am 往右 2 格，C♯m7 = Am 往右 4 格。看到封閉和弦，腦中先閃 A / Am！' },
+  { key:'G', label:'G 骨架家族', chipLabel:'G 骨架', color:'#9b59d9',
+    members:['G','Gadd9'],
+    insight:'G 指型：中指⑥弦3格、食指⑤弦2格、無名+小指①②弦3格。Gadd9 = G 的最精簡版，拿掉③④弦按壓，空弦自然共鳴，飄浮又溫暖。G ↔ Gadd9 ↔ Cadd9 是流行三角！' },
+  { key:'E', label:'E 骨架家族', chipLabel:'E 骨架', color:'#5b8dd9',
+    members:['E','Em','F','F#m'],
+    insight:'E / Em 指型平移：F = E 往右 1 格加食指橫按，F♯m = Em 往右 2 格加橫按。看到 F 系封閉和弦，腦中先浮現 E 指型！' },
   { key:'D', label:'D 骨架家族', chipLabel:'D 骨架', color:'#5bd98c',
     members:['D','Dm','Dsus2'],
     insight:'D 家族三兄弟：同按 ①②③ 弦，只需微調一兩根手指即可互換。D ↔ Dm ↔ Dsus2 一秒切換！' },
@@ -542,6 +552,8 @@ const MEMORY_TIPS = {
   'Esus4':'💡 比 E 把 ④③② 弦都往右移一格，鬆手就回到 E！',
   'G':    '💡 E 指型開放等效版（往右移 3 格），小指撐住低音 E 弦 3fr！',
   'B7':   '💡 以食指按 ④ 弦 1fr 為核心軸，其他三指環繞，記住中心點！',
+  'Gadd9':'💡 G 的精簡版：中指⑥弦3格、食指⑤弦2格、無名＋小指①②弦3格，③④空弦自然共鳴！',
+  'Cadd9':'💡 C 的延伸：無名指蓋①⑤弦3格、中指④弦2格、小指②弦3格，拿掉食指讓空弦唱歌！',
 };
 
 const DIFF_HINTS = {
