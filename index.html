@@ -250,14 +250,15 @@ body{background:#0f0f0f;color:#e0e0e0;font-family:'Segoe UI',sans-serif;min-heig
       <button class="nav-item" id="nav-chord" onclick="switchTab('chord')">
         <span class="nav-icon">🎵</span>和弦記憶
       </button>
-      <button class="nav-item" id="nav-songs" onclick="switchTab('songs')">
-        <span class="nav-icon">📄</span>歌譜
-      </button>
       <button class="nav-item" id="nav-train" onclick="switchTab('train')">
-        <span class="nav-icon">💪</span>肌肉記憶特訓
+        <span class="nav-icon">💪</span>肌肉記憶測驗
+      </button>
+      <button class="nav-item" id="nav-songs" onclick="switchTab('songs')" style="justify-content:space-between">
+        <span><span class="nav-icon">📄</span>吉他譜</span>
+        <span id="songs-nav-arrow" style="font-size:.65rem;transition:transform .25s;display:inline-block">▶</span>
       </button>
     </div>
-    <div id="song-list" style="display:none"></div>
+    <div id="song-list" style="display:none;overflow-y:auto;max-height:calc(100vh - 260px);border-top:1px solid #1e1e1e"></div>
   </div>
 </nav>
 
@@ -576,7 +577,6 @@ const DIFFICULTY_LABELS = {
 let learned = JSON.parse(localStorage.getItem(LKEY) || '{}');
 let chordFilter = 'all';
 let cagedFilter = null;
-let chordSort = 'difficulty';
 let curTab = 'home';
 
 function save(){ localStorage.setItem(LKEY, JSON.stringify(learned)); }
@@ -670,6 +670,8 @@ function switchTab(t){
   document.getElementById('song-view').style.display  = t==='songs' ?'block':'none';
   document.getElementById('train-view').style.display = t==='train' ?'block':'none';
   document.getElementById('song-list').style.display  = t==='songs' ?'block':'none';
+  const arr=document.getElementById('songs-nav-arrow');
+  if(arr) arr.style.transform = t==='songs'?'rotate(90deg)':'rotate(0deg)';
   if(t!=='train') stopDetector();
   if(t==='home')  { curSong=null; renderHome(); }
   if(t==='chord') renderChords();
@@ -737,8 +739,8 @@ function renderChords(){
   const types=['all','open','power','barre'];
   const typeLabel={all:'全部',open:'開放',power:'Power',barre:'封閉'};
   const famIds=cagedFilter?new Set(CAGED_FAMILIES.find(f=>f.key===cagedFilter)?.members||[]):null;
-  let filtered=CHORDS.filter(c=>(chordFilter==='all'||c.type===chordFilter)&&(!famIds||famIds.has(c.id)));
-  if(chordSort==='difficulty') filtered=[...filtered].sort((a,b)=>(a.difficulty||9)-(b.difficulty||9));
+  let filtered=[...CHORDS.filter(c=>(chordFilter==='all'||c.type===chordFilter)&&(!famIds||famIds.has(c.id)))]
+    .sort((a,b)=>(a.difficulty||9)-(b.difficulty||9));
   const getFam=id=>CAGED_FAMILIES.find(f=>f.members.includes(id));
   const activeFam=cagedFilter?CAGED_FAMILIES.find(f=>f.key===cagedFilter):null;
   const banner=activeFam?`<div class="caged-banner show" style="background:${activeFam.color}14;border:1px solid ${activeFam.color}44;color:${activeFam.color}dd">🎸 ${activeFam.label}：${activeFam.insight}</div>`:'';
@@ -748,11 +750,8 @@ function renderChords(){
       <button class="caged-tab" style="${!cagedFilter?'border-color:#e8c97a;color:#e8c97a;background:#2a1a00':''}" onclick="setCagedFilter(null)">全部</button>
       ${CAGED_FAMILIES.map(f=>`<button class="caged-tab" style="${cagedFilter===f.key?`border-color:${f.color};color:${f.color};background:${f.color}1a`:''}" onclick="setCagedFilter('${f.key}')">${f.label}</button>`).join('')}
     </div>
-    <div class="chord-filters" style="display:flex;align-items:center;gap:8px;flex-wrap:wrap">
+    <div class="chord-filters">
       ${types.map(t=>`<button class="chord-filter-btn${chordFilter===t?' active':''}" onclick="setFilter('${t}')">${typeLabel[t]}</button>`).join('')}
-      <div style="flex:1"></div>
-      <button class="chord-filter-btn${chordSort==='difficulty'?' active':''}" onclick="setChordSort('difficulty')" title="由簡到難排列">⬆ 難度排序</button>
-      <button class="chord-filter-btn${chordSort==='default'?' active':''}" onclick="setChordSort('default')" title="依新增順序">預設順序</button>
     </div>
     ${banner}
     <div class="chord-grid">
@@ -760,7 +759,7 @@ function renderChords(){
         const fam=getFam(c.id);
         const famChip=fam?`<div class="fam-chip fam-chip-${fam.key}">${fam.chipLabel}</div>`:'';
         const dl=DIFFICULTY_LABELS[c.difficulty];
-        const diffChip=dl?`<div style="font-size:.58rem;font-weight:700;letter-spacing:.04em;padding:1px 7px;border-radius:8px;margin-bottom:3px;background:${dl.color}18;color:${dl.color};border:1px solid ${dl.color}44">${dl.label}</div>`:'';
+        const diffChip=dl?`<div style="font-size:.72rem;color:${dl.color};letter-spacing:1px;margin-bottom:2px">${'★'.repeat(c.difficulty)}${'☆'.repeat(5-c.difficulty)}</div>`:'';
         const memTip=MEMORY_TIPS[c.id]?`<div class="c-memory-tip">${MEMORY_TIPS[c.id]}</div>`:'';
         const diff=DIFF_HINTS[c.id];
         const diffMsg=diff?`<div class="diff-msg">👆 ${diff.msg}</div>`:'';
@@ -794,7 +793,6 @@ function renderChords(){
     </div>
   `;
 }
-function setChordSort(s){ chordSort=s; renderChords(); }
 
 function flipChord(id){ document.getElementById('cc-'+id).classList.toggle('flipped'); }
 function markChord(e,id){ e.stopPropagation(); toggleLearned(id); renderChords(); renderSidebar(); }
