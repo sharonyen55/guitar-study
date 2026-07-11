@@ -71,7 +71,7 @@ body{background:#0f0f0f;color:#e0e0e0;font-family:'Segoe UI',sans-serif;min-heig
 .chord-filter-btn{padding:5px 14px;border:1px solid #333;border-radius:20px;background:transparent;color:#aaa;cursor:pointer;font-size:.8rem;transition:all .2s}
 .chord-filter-btn.active{border-color:#e8c97a;color:#e8c97a;background:#2a1a00}
 .chord-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:12px}
-.c-card{perspective:600px;height:200px;cursor:pointer}
+.c-card{perspective:600px;height:240px;cursor:pointer}
 .c-inner{position:relative;width:100%;height:100%;transform-style:preserve-3d;transition:transform .45s}
 .c-card.flipped .c-inner{transform:rotateY(180deg)}
 .c-face,.c-back{position:absolute;inset:0;backface-visibility:hidden;border-radius:12px;border:1px solid #2a2a2a;display:flex;flex-direction:column;align-items:center;justify-content:center;background:#1a1a1a;padding:12px}
@@ -157,8 +157,7 @@ body{background:#0f0f0f;color:#e0e0e0;font-family:'Segoe UI',sans-serif;min-heig
 @keyframes ghostBlink{0%,100%{fill:rgba(255,80,80,.12);stroke:rgba(255,80,80,.5)}50%{fill:rgba(255,80,80,.4);stroke:rgba(255,80,80,1)}}
 .chord-ghost{fill:none;stroke:rgba(255,80,80,0);stroke-dasharray:5,3;stroke-width:2.5}
 .c-card:hover .chord-ghost,.ghost-on .chord-ghost{animation:ghostBlink 1s ease-in-out infinite}
-.diff-msg{display:none;font-size:.65rem;color:#c84b4b;text-align:center;margin-top:4px;padding:0 6px;line-height:1.5}
-.c-card:hover .diff-msg{display:block}
+.diff-msg{font-size:.65rem;color:#c84b4b;text-align:center;margin-top:4px;padding:0 6px;line-height:1.5}
 
 /* ── Train view ── */
 #train-view{display:none}
@@ -759,7 +758,7 @@ function renderChords(){
         const fam=getFam(c.id);
         const famChip=fam?`<div class="fam-chip fam-chip-${fam.key}">${fam.chipLabel}</div>`:'';
         const dl=DIFFICULTY_LABELS[c.difficulty];
-        const diffChip=dl?`<div style="font-size:.72rem;color:${dl.color};letter-spacing:1px;margin-bottom:2px">${'★'.repeat(c.difficulty)}${'☆'.repeat(5-c.difficulty)}</div>`:'';
+        const diffChip=dl?`<div style="font-size:.72rem;color:#e8c97a;letter-spacing:1px;margin-bottom:2px">${'★'.repeat(c.difficulty)}</div>`:'';
         const memTip=MEMORY_TIPS[c.id]?`<div class="c-memory-tip">${MEMORY_TIPS[c.id]}</div>`:'';
         const diff=DIFF_HINTS[c.id];
         const diffMsg=diff?`<div class="diff-msg">👆 ${diff.msg}</div>`:'';
@@ -776,10 +775,10 @@ function renderChords(){
               <div class="c-type">${c.full}</div>
               ${c.desc?`<div style="font-size:.72rem;color:#666;margin-top:6px;text-align:center">${c.desc}</div>`:''}
               ${memTip}
-              ${diffMsg}
             </div>
             <div class="c-back">
-              <div class="c-diagram">${chordSVG(c,130,{ghosts:diff?.ghosts})}</div>
+              <div class="c-diagram ghost-on">${chordSVG(c,130,{ghosts:diff?.ghosts})}</div>
+              ${diffMsg}
               <div style="display:flex;flex-direction:column;align-items:center;gap:5px;width:100%">
                 ${protoBtn}
                 <button class="c-chk-btn" onclick="markChord(event,'${c.id}')">
