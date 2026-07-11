@@ -210,6 +210,24 @@ body{background:#0f0f0f;color:#e0e0e0;font-family:'Segoe UI',sans-serif;min-heig
 .det-bar-fill.r3{background:#333}
 .det-pct{font-size:.73rem;color:#555;width:34px;text-align:right}
 .det-hint{font-size:.72rem;color:#444;text-align:center;line-height:1.6}
+
+/* ── Quiz zone ── */
+.qz-tabs{display:flex;gap:8px;margin-bottom:20px;flex-wrap:wrap}
+.qz-tab{padding:7px 18px;border:1px solid #333;border-radius:20px;background:transparent;color:#666;font-size:.83rem;cursor:pointer;transition:all .2s}
+.qz-tab:hover:not(:disabled){border-color:#555;color:#ccc}
+.qz-tab.active{border-color:#e8c97a;color:#e8c97a;background:#2a1a00}
+.qz-tab:disabled{opacity:.35;cursor:default}
+.qz-wrap{background:#1a1a1a;border:1px solid #2a2a2a;border-radius:16px;padding:28px;display:flex;flex-direction:column;align-items:center;gap:16px;min-height:300px;justify-content:center}
+.qz-question{font-size:3rem;font-weight:800;color:#e8c97a;letter-spacing:.03em;line-height:1}
+.qz-subtitle{font-size:.82rem;color:#555;margin-top:-10px}
+.qz-opts{display:grid;grid-template-columns:1fr 1fr;gap:10px;width:100%;max-width:480px}
+.qz-opt{background:#111;border:2px solid #222;border-radius:10px;padding:8px;cursor:pointer;transition:border-color .15s,background .15s;display:flex;align-items:center;justify-content:center}
+.qz-opt:hover:not(.answered){border-color:#555;background:#181818}
+.qz-opt.correct{border-color:#4caf7d !important;background:rgba(76,175,125,.1)}
+.qz-opt.wrong{border-color:#c84b4b !important;background:rgba(200,75,75,.08)}
+.qz-opt.answered{cursor:default}
+.qz-meta{display:flex;justify-content:space-between;align-items:center;width:100%;font-size:.75rem;color:#555}
+.qz-streak-n{color:#e8c97a;font-weight:700;font-size:1.1rem}
 </style>
 </head>
 <body>
@@ -1017,71 +1035,65 @@ function renderFCCard(){
   </div>`;
 }
 
-/* ── Slide trainer ── */
-const _sa={};
-function playSlide(id){
-  if(_sa[id]) return;
-  const bc=CHORDS.find(c=>c.id===id);
-  const proto=BARRE_PROTOTYPES[id];
-  if(!bc||!proto) return;
-  const el=document.getElementById('sc-'+id);
-  const btn=document.getElementById('sb-'+id);
-  if(!el||!btn) return;
-  _sa[id]=true; btn.disabled=true; btn.textContent='◼ 播放中…';
+/* ── Quiz zone ── */
+let trainMode='pick';
+let qz={chord:null,options:[],answered:false,chosen:null,streak:0,hits:0,total:0,started:false};
 
-  const pc=CHORDS.find(c=>c.id===proto.protoId);
-  const fromFret=1;                  // 開放把位（從格位 1 開始）
-  const toFret=bc.startFret;         // 目標封閉格位
-  const STEPS=Math.max(12, proto.shift*10);
-  const MS=45;
-
-  // ① 先靜態顯示開放原型（0.6s）
-  el.innerHTML=pc?chordSVG(pc,130):chordSVGShifted(bc,fromFret);
-  setTimeout(()=>{
-    // ② 往上滑 fromFret → toFret
-    let f=0;
-    const ph1=setInterval(()=>{
-      f++;
-      const disp=fromFret+Math.round((toFret-fromFret)*(f/STEPS));
-      el.innerHTML=chordSVGShifted(bc,disp);
-      if(f>=STEPS){
-        clearInterval(ph1);
-        el.innerHTML=chordSVG(bc,130); // 顯示最終正確圖
-        // ③ 停在目標 0.9s
-        setTimeout(()=>{
-          // ④ 滑回 toFret → fromFret
-          let f2=0;
-          const ph2=setInterval(()=>{
-            f2++;
-            const disp2=toFret-Math.round((toFret-fromFret)*(f2/STEPS));
-            el.innerHTML=chordSVGShifted(bc,Math.max(1,disp2));
-            if(f2>=STEPS){
-              clearInterval(ph2);
-              el.innerHTML=pc?chordSVG(pc,130):chordSVGShifted(bc,fromFret);
-              // ⑤ 停在原型 0.5s 再恢復
-              setTimeout(()=>{
-                el.innerHTML=chordSVG(bc,130);
-                _sa[id]=false; btn.disabled=false; btn.textContent='▶ 播放平移動畫';
-              },500);
-            }
-          },MS);
-        },900);
-      }
-    },MS);
-  },600);
+function setTrainMode(mode){
+  trainMode=mode;
+  if(mode!=='strum'){ fc.micMode=false; stopDetector(); }
+  renderTrain();
 }
 
-function renderSlideGrid(){
-  return `<div class="slide-grid">${CHORDS.filter(c=>BARRE_PROTOTYPES[c.id]).map(c=>{
-    const p=BARRE_PROTOTYPES[c.id];
-    const pc=CHORDS.find(x=>x.id===p.protoId);
-    return `<div class="slide-card">
-      <div class="slide-card-name">${c.name}</div>
-      <div class="slide-card-sub">${pc?pc.name:'?'} → 右移 +${p.shift} 格</div>
-      <div id="sc-${c.id}">${chordSVG(c,130)}</div>
-      <button class="slide-play-btn" id="sb-${c.id}" onclick="playSlide('${c.id}')">▶ 播放平移動畫</button>
+function qzStart(){ qz.started=true; qzNext(); }
+function qzNext(){
+  const pool=CHORDS.filter(c=>c.type!=='power');
+  qz.chord=pool[Math.floor(Math.random()*pool.length)];
+  const wrong=pool.filter(c=>c.id!==qz.chord.id).sort(()=>Math.random()-.5).slice(0,3);
+  qz.options=[...wrong,qz.chord].sort(()=>Math.random()-.5);
+  qz.answered=false; qz.chosen=null;
+  renderQuizPick();
+}
+function qzAnswer(id){
+  if(qz.answered) return;
+  qz.answered=true; qz.chosen=id; qz.total++;
+  const ok=id===qz.chord.id;
+  if(ok){qz.hits++;qz.streak++;}else{qz.streak=0;}
+  renderQuizPick();
+  setTimeout(qzNext, ok?900:1800);
+}
+function renderQuizPick(){
+  const area=document.getElementById('qz-area');
+  if(!area) return;
+  if(!qz.started||!qz.chord){
+    area.innerHTML=`<div class="qz-wrap">
+      <div style="font-size:2.2rem">🎯</div>
+      <div style="font-size:1.1rem;font-weight:600;color:#ccc">指型選擇測驗</div>
+      <div style="font-size:.82rem;color:#555;text-align:center">系統出題和弦名稱<br>從 4 張圖選出正確指法</div>
+      <button class="fc-btn fc-btn-reveal" style="font-size:.95rem;padding:10px 28px" onclick="qzStart()">🎯 開始測驗</button>
     </div>`;
-  }).join('')}</div>`;
+    return;
+  }
+  const c=qz.chord;
+  const acc=qz.total?Math.round(qz.hits/qz.total*100):'--';
+  area.innerHTML=`<div class="qz-wrap">
+    <div class="qz-question">${c.name}</div>
+    <div class="qz-subtitle">${c.full}</div>
+    <div class="qz-opts">
+      ${qz.options.map(opt=>{
+        let cls='qz-opt'+(qz.answered?' answered':'');
+        if(qz.answered){
+          if(opt.id===c.id) cls+=' correct';
+          else if(opt.id===qz.chosen) cls+=' wrong';
+        }
+        return `<div class="${cls}" onclick="qzAnswer('${opt.id}')">${chordSVG(opt,110)}</div>`;
+      }).join('')}
+    </div>
+    <div class="qz-meta">
+      <div>🔥 連續 <span class="qz-streak-n">${qz.streak}</span></div>
+      <div>${qz.total} 題 · 正確率 ${qz.total?acc+'%':'--'}</div>
+    </div>
+  </div>`;
 }
 
 /* ── Chord Detector ── */
@@ -1212,18 +1224,17 @@ function renderDetResult(scores){
 
 function renderTrain(){
   document.getElementById('train-view').innerHTML=`
-    <div class="home-title">💪 肌肉記憶特訓</div>
-    <div class="train-sec">
-      <div class="train-sec-hd">⚡ 快閃字卡 · Active Recall 盲背測驗</div>
-      <div id="fc-area"></div>
+    <div class="home-title">💪 肌肉記憶測驗</div>
+    <div class="qz-tabs">
+      <button class="qz-tab${trainMode==='pick'?' active':''}" onclick="setTrainMode('pick')">🎯 指型選擇</button>
+      <button class="qz-tab${trainMode==='strum'?' active':''}" onclick="setTrainMode('strum')">🎙 刷弦挑戰</button>
+      <button class="qz-tab" disabled>🎵 音階位置（準備中）</button>
     </div>
-    <div class="train-sec">
-      <div class="train-sec-hd">🎸 平移動畫 · 封閉和弦指型平移特訓</div>
-      <p style="font-size:.8rem;color:#555;margin-bottom:14px">點擊播放，觀察指型如何從開放把位平移到封閉位置</p>
-      ${renderSlideGrid()}
-    </div>
+    ${trainMode==='pick'?'<div id="qz-area"></div>':''}
+    ${trainMode==='strum'?'<div id="fc-area"></div>':''}
   `;
-  renderFCCard();
+  if(trainMode==='pick') renderQuizPick();
+  if(trainMode==='strum') renderFCCard();
 }
 
 /* ── Chord popup ── */
