@@ -1028,27 +1028,47 @@ function playSlide(id){
   const btn=document.getElementById('sb-'+id);
   if(!el||!btn) return;
   _sa[id]=true; btn.disabled=true; btn.textContent='◼ 播放中…';
-  const shift=proto.shift, FPF=8, MS=50, total=shift*FPF;
-  let f=0;
-  const ph1=setInterval(()=>{
-    f++;
-    el.innerHTML=chordSVGShifted(bc,Math.max(1,Math.round(bc.startFret-shift*(f/total))));
-    if(f>=total){
-      clearInterval(ph1);
-      setTimeout(()=>{
-        let f2=0;
-        const ph2=setInterval(()=>{
-          f2++;
-          el.innerHTML=chordSVGShifted(bc,Math.round(Math.max(1,bc.startFret-shift)+shift*(f2/total)));
-          if(f2>=total){
-            clearInterval(ph2);
-            el.innerHTML=chordSVG(bc,130);
-            _sa[id]=false; btn.disabled=false; btn.textContent='▶ 播放平移動畫';
-          }
-        },MS);
-      },600);
-    }
-  },MS);
+
+  const pc=CHORDS.find(c=>c.id===proto.protoId);
+  const fromFret=1;                  // 開放把位（從格位 1 開始）
+  const toFret=bc.startFret;         // 目標封閉格位
+  const STEPS=Math.max(12, proto.shift*10);
+  const MS=45;
+
+  // ① 先靜態顯示開放原型（0.6s）
+  el.innerHTML=pc?chordSVG(pc,130):chordSVGShifted(bc,fromFret);
+  setTimeout(()=>{
+    // ② 往上滑 fromFret → toFret
+    let f=0;
+    const ph1=setInterval(()=>{
+      f++;
+      const disp=fromFret+Math.round((toFret-fromFret)*(f/STEPS));
+      el.innerHTML=chordSVGShifted(bc,disp);
+      if(f>=STEPS){
+        clearInterval(ph1);
+        el.innerHTML=chordSVG(bc,130); // 顯示最終正確圖
+        // ③ 停在目標 0.9s
+        setTimeout(()=>{
+          // ④ 滑回 toFret → fromFret
+          let f2=0;
+          const ph2=setInterval(()=>{
+            f2++;
+            const disp2=toFret-Math.round((toFret-fromFret)*(f2/STEPS));
+            el.innerHTML=chordSVGShifted(bc,Math.max(1,disp2));
+            if(f2>=STEPS){
+              clearInterval(ph2);
+              el.innerHTML=pc?chordSVG(pc,130):chordSVGShifted(bc,fromFret);
+              // ⑤ 停在原型 0.5s 再恢復
+              setTimeout(()=>{
+                el.innerHTML=chordSVG(bc,130);
+                _sa[id]=false; btn.disabled=false; btn.textContent='▶ 播放平移動畫';
+              },500);
+            }
+          },MS);
+        },900);
+      }
+    },MS);
+  },600);
 }
 
 function renderSlideGrid(){
