@@ -904,18 +904,75 @@ function renderSheet(sheet){
 }
 
 /* ── Flashcard ── */
-let fc={chord:null,revealed:false,streak:0,hits:0,total:0,started:false};
+let fc={chord:null,revealed:false,streak:0,hits:0,total:0,started:false,micMode:false,detBuf:[],detLock:false};
 
 function fcStart(){ fc.started=true; fcNext(); }
 function fcNext(){
   const pool=CHORDS.filter(c=>c.type!=='power');
   fc.chord=pool[Math.floor(Math.random()*pool.length)];
   fc.revealed=false;
+  fc.detBuf=[];
+  fc.detLock=false;
   renderFCCard();
 }
 function fcReveal(){ fc.revealed=true; fc.total++; renderFCCard(); }
 function fcGot(){ fc.hits++; fc.streak++; fcNext(); }
 function fcMiss(){ fc.streak=0; fcNext(); }
+
+function fcToggleMic(){
+  fc.micMode=!fc.micMode;
+  fc.detBuf=[];
+  fc.detLock=false;
+  if(fc.micMode&&!detRunning) toggleDetector();
+  renderFCCard();
+}
+
+function fcProcessDetection(top){
+  if(fc.detLock||fc.revealed||!fc.started||!fc.chord) return;
+  if(top.s<0.42){ fc.detBuf=[]; updateFCDetIndicator(null,0); return; }
+  updateFCDetIndicator(top.c.name,top.s);
+  fc.detBuf.push(top.c.id);
+  if(fc.detBuf.length>6) fc.detBuf.shift();
+  const consistent=fc.detBuf.filter(id=>id===top.c.id).length;
+  if(consistent<3) return;
+  fc.detBuf=[];
+  fc.detLock=true;
+  if(top.c.id===fc.chord.id){
+    fcAutoCorrect();
+  } else {
+    showFCMismatch(top.c.name);
+    setTimeout(()=>{ fc.detLock=false; },1800);
+  }
+}
+
+function updateFCDetIndicator(name,score){
+  const el=document.getElementById('fc-det-ind');
+  if(!el) return;
+  if(!name){ el.innerHTML='<span style="color:#2a2a2a">🎙 聆聽中…</span>'; return; }
+  const pct=Math.round(score*100);
+  const col=score>0.55?'#4caf7d':score>0.42?'#e8c97a':'#555';
+  el.innerHTML=`<span style="color:${col}">🎵 偵測到 ${name} · ${pct}%</span>`;
+}
+
+function fcAutoCorrect(){
+  const wrap=document.querySelector('#fc-area .fc-wrap');
+  if(wrap){
+    wrap.style.transition='border-color .2s,background .2s';
+    wrap.style.borderColor='#4caf7d';
+    wrap.style.background='rgba(76,175,125,.08)';
+    const badge=document.createElement('div');
+    badge.style.cssText='font-size:3.5rem;animation:fcIn .25s ease;pointer-events:none';
+    badge.textContent='✅';
+    wrap.insertBefore(badge,wrap.firstChild);
+  }
+  fc.hits++; fc.streak++;
+  setTimeout(()=>{ fc.detLock=false; fcNext(); },1100);
+}
+
+function showFCMismatch(name){
+  const el=document.getElementById('fc-det-ind');
+  if(el) el.innerHTML=`<span style="color:#c84b4b">❌ 偵測到 ${name}，再刷一次！</span>`;
+}
 
 function renderFCCard(){
   const area=document.getElementById('fc-area');
@@ -931,6 +988,9 @@ function renderFCCard(){
   }
   const c=fc.chord;
   const acc=fc.total?Math.round(fc.hits/fc.total*100):'--';
+  const micBtn=`<button class="fc-btn" style="${fc.micMode?'color:#5b8dd9;border-color:rgba(91,141,217,.6);background:rgba(91,141,217,.1)':''}" onclick="fcToggleMic()">
+    ${fc.micMode?'🎙 刷弦偵測中':'🎙 啟用刷弦偵測'}
+  </button>`;
   area.innerHTML=`<div class="fc-wrap">
     <div class="fc-name">${c.name}</div>
     <div class="fc-full">${c.full}</div>
@@ -942,10 +1002,13 @@ function renderFCCard(){
         <button class="fc-btn fc-btn-miss" onclick="fcMiss()">🔄 再練</button>
       </div>`:`
       <div class="fc-diagram">${chordSVGBlank(150)}</div>
-      <div style="font-size:.75rem;color:#333">默想左手按法後點「看答案」</div>
+      ${fc.micMode
+        ?`<div id="fc-det-ind" style="font-size:.78rem;min-height:1.4em;text-align:center"><span style="color:#2a2a2a">🎙 聆聽中…</span></div>`
+        :`<div style="font-size:.75rem;color:#333">默想左手按法後點「看答案」</div>`}
       <div class="fc-ctrls">
-        <button class="fc-btn fc-btn-reveal" onclick="fcReveal()">👁 看答案</button>
+        ${fc.micMode?'':`<button class="fc-btn fc-btn-reveal" onclick="fcReveal()">👁 看答案</button>`}
         <button class="fc-btn" onclick="fcNext()">⏭ 跳過</button>
+        ${micBtn}
       </div>`}
     <div class="fc-meta">
       <div>🔥 連續 <span class="fc-streak-n">${fc.streak}</span></div>
@@ -1073,7 +1136,7 @@ function stopDetector(){
 
 function drawSpectrum(){
   const canvas=document.getElementById('det-canvas');
-  if(!canvas||!detAna) return;
+  if(!canvas||!detAna||!detCtx) return;
   const ctx2=canvas.getContext('2d');
   const W=canvas.width,H=canvas.height;
   ctx2.clearRect(0,0,W,H);
@@ -1101,10 +1164,13 @@ function runDetector(){
     if(peaks.size>=2){
       const scores=CHORDS.map(c=>({c,s:scoreChord(peaks,c)}))
         .sort((a,b)=>b.s-a.s).slice(0,3);
-      renderDetResult(scores);
+      const detEl=document.getElementById('det-result');
+      if(detEl) renderDetResult(scores);
+      if(fc.micMode&&fc.started&&fc.chord&&!fc.revealed) fcProcessDetection(scores[0]);
     } else {
-      const el=document.getElementById('det-result');
-      if(el) el.innerHTML=`<div class="det-big" style="color:#2a2a2a">—</div>`;
+      const detEl=document.getElementById('det-result');
+      if(detEl) detEl.innerHTML=`<div class="det-big" style="color:#2a2a2a">—</div>`;
+      if(fc.micMode) updateFCDetIndicator(null,0);
     }
   }
   detRAF=requestAnimationFrame(runDetector);
