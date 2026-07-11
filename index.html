@@ -336,52 +336,61 @@ const SONGS = [
 
   {id:2, title:"軌跡", artist:"Roselia", note:"A 大調・Drop D Tuning（♩≈82）・譜面原標：Aadd9≈A、Dadd9≈D、Esus4≈E", sheet:[
 
-    {type:'section', label:'前奏 Intro', strum:'分散和弦（鍵盤主旋律，吉他靜音）'},
+    {type:'section', label:'前奏 Intro', strum:'Clean + Dot 8th Delay｜下刷一次 Let Ring',
+     tip:'💡 左手大橫壓第12格（①~③弦），無名指按③弦14格｜右手順暢下刷一次，放開讓Delay無限延響｜不要亂刷，這裡是氛圍鋪墊'},
 
-    {type:'section', label:'主歌 A'},
+    {type:'section', label:'主歌 A [A]', strum:'Tacet（吉他完全靜音）',
+     tip:'🤫 完全不彈！此段為主唱與純鋼琴的靜謐對話｜吉他手保持靜止，為後續爆發蓄力'},
     {chords:['A'], lyrics:`くつひもが ほどければ むすびなおす ように`},
     {chords:['E'], lyrics:`わかれても とぎれても`},
     {chords:['E','F#m'], lyrics:`またつながる ために であうべく`},
     {chords:['D'], lyrics:`ひとは あゆんでゆく`},
 
-    {type:'section', label:'主歌 B'},
+    {type:'section', label:'主歌 B [B]', strum:'Clean｜分解和弦 Arp. 8分音符',
+     tip:'💡 依然不刷弦，改彈 Arp. 分散｜左手按 Power Chord 指型（D5/A5/E5）｜右手依序撥出各弦8分音符，清脆延響 Let Ring'},
     {chords:['D','A'], lyrics:`かなしみで むねのなか おぼれそうなら`},
     {chords:['E','F#m'], lyrics:`まぶたとじ むかえよう いつもかわらずに わらいあう`},
 
     {type:'section', label:'Pre-Chorus'},
     {chords:['E','D'], lyrics:`たのしいひとみが ほらね ただきれい`},
 
-    {type:'section', label:'副歌'},
+    {type:'section', label:'副歌 [C]', strum:'Clean + 空間系效果｜16分音符交錯分解 Arpeggio',
+     tip:'🎯 右手展開華麗16分音符行雲流水分解｜F♯m7 段落改按 Asus4 指型彈分解（勿按標準F♯m7）｜最後 "きずなが ある" 往下輕刷一個長音，讓聲音擴散後接鼓過門'},
     {chords:['E','A'], lyrics:`"ありがとう" めぐりあうように いのちは`},
     {chords:['F#m','A','D','A'], lyrics:`くりかえしてく はじまりというなのみちを ふりむかず`},
     {chords:['Bm7','E','A'], lyrics:`まえをみつめ "ありがとう" まわるちきゅう`},
     {chords:['E','F#m','A','D'], lyrics:`あなたと わたしは すすむ にぎったてを はなれても`},
     {chords:['C#m7','F#m','D','E','A'], lyrics:`おわらないきずなが ある`},
 
-    {type:'section', label:'主歌 C'},
+    {type:'section', label:'主歌 C [D]', strum:'Distortion ON｜Palm Mute 全下刷 ⬇×8',
+     tip:'🎸 破音全開！右手小魚際輕壓琴橋做手掌悶音｜全下刷(Downstrokes) 8分音符連擊，每小節穩砸8下｜刷出低沉推進感音牆'},
     {chords:['A','Esus4'], lyrics:`あすもまた くることが あたりまえのように ふるまうのを うたがわず`},
     {chords:['E','F#m'], lyrics:`ほしょうもない ひびの はかなき ひとは`},
 
-    {type:'section', label:'間奏 E（吉他主奏）'},
+    {type:'section', label:'間奏 E [E]', strum:'Distortion｜悶音解除→ Power Stroke 全開刷弦',
+     tip:'💡 段落開頭先做帥氣大滑音(Slide)衝進｜解除Palm Mute，讓破音音牆徹底炸裂｜⚠️ 結尾 "ただきれいで" 全團 Fermata Mute，瞬間悶死所有弦→隨後一個極輕Clean分散帶過'},
     {chords:['D','A'], lyrics:`いだいてる ふりかえる やさしきに`},
     {chords:['A','E'], lyrics:`みちた まいにちは たいせつなものたちを のこしてくれた`},
     {chords:['F#m','E','D'], lyrics:`やわらく こちよい いろはほら ね`},
     {chords:['D','Esus4','E'], lyrics:`ただきれい "ありがとう"`},
 
-    {type:'section', label:'副歌 2'},
+    {type:'section', label:'副歌 2 [F]', strum:'16分音符分散和弦 Arpeggio（同副歌一）',
+     tip:'🎯 F♯m7 依舊按 Asus4 指型｜後段 "つらくないのは" 切回 Palm Mute 破音節奏'},
     {chords:['A','E','F#m','Esus4'], lyrics:`うたをうたい ひたすら いとしきをつげ`},
     {chords:['D','A','Bm7','E'], lyrics:`ふれだすおもいは ずっと ほしのように またたく から "ありがとう"`},
     {chords:['A','E','F#m','Esus4'], lyrics:`まわるちきゅう あなたと わたしは すすむ`},
     {chords:['D','C#m7','F#m','D','E','A'], lyrics:`すごすばしょ ちがっても かわらないけしきがある`},
 
-    {type:'section', label:'Bridge'},
+    {type:'section', label:'Bridge [G]', strum:'Palm Mute → N.C. 完全消音',
+     tip:'🛑 唱到 "たえたい…ありがとう" 出現 N.C.（No Chord）｜吉他百分之百消音，把整個空間完全交給人聲與純鋼琴靈魂對話'},
     {chords:['A','D'], lyrics:`よみがえる あのすがた`},
     {chords:['D'], lyrics:`ふとよみがえる あのすがた`},
     {chords:['F#m','A','Bm7'], lyrics:`こころは さざめき だれだって つらくないのは`},
     {chords:['C#m7','D'], lyrics:`そうだけど きっと ことばでもっと`},
     {chords:['Esus4','E'], lyrics:`つたえたい "ありがとう"`},
 
-    {type:'section', label:'副歌 3（最終）'},
+    {type:'section', label:'副歌 3 最終 [H]', strum:'Distortion + Delay｜高把位八度音激情刷弦',
+     tip:'🔥 全團總動員！前半彈高把位八度音(Octave)音牆｜🎯 最後 "せんもとわをかさね" 滑回招牌把位：食指橫壓①~③弦12格，無名指③弦14格｜蓄力重刷長音 Let Ring，讓破音+Delay無限延響直到自然淡出'},
     {chords:['A','Esus4','F#m','A'], lyrics:`ここであえた あなたと わたしのきせき`},
     {chords:['D','A','Bm7'], lyrics:`ひとつだって わすれないわ いつまでも あついまで`},
     {chords:['F#m','A','D','A'], lyrics:`くりかえしてく はじまりというなのみちを ふりむかず`},
@@ -389,7 +398,8 @@ const SONGS = [
     {chords:['E','F#m','A','D'], lyrics:`あなたと わたしは すすむ にぎったてを はなれても`},
     {chords:['C#m7','F#m','D','Esus4','E','A'], lyrics:`おわらないきずなが ある`},
 
-    {type:'section', label:'尾奏 Outro', strum:'吉他分散和弦漸弱'},
+    {type:'section', label:'尾奏 Outro', strum:'吉他分散和弦漸弱 Let Ring',
+     tip:'💡 破音+Delay持續開啟，任由音色在空氣中自然淡出收尾'},
     {chords:['D','Esus4','D'], lyrics:`せんもとわをかさね`},
   ]},
 ];
