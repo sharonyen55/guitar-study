@@ -674,7 +674,7 @@ function fretboardSVG(){
   const CHROMATIC=['C','C#','D','D#','E','F','F#','G','G#','A','A#','B'];
   const C_MAJOR=new Set(['C','D','E','F','G','A','B']);
   const FRETS=15,STRINGS=6;
-  const cw=44,ch=28,ml=20,mr=8,mt=28,mb=14,r=10;
+  const cw=44,ch=28,ml=20,mr=8,mt=14,mb=22,r=10;
   const W=ml+(FRETS+1)*cw+mr, H=mt+(STRINGS-1)*ch+mb;
   let g=`<svg viewBox="0 0 ${W} ${H}" xmlns="http://www.w3.org/2000/svg" style="width:100%;min-width:560px;height:auto;display:block">`;
   g+=`<rect width="${W}" height="${H}" fill="#131313" rx="8"/>`;
@@ -702,10 +702,10 @@ function fretboardSVG(){
     g+=`<circle cx="${x12}" cy="${midY-ch}" r="3.5" fill="#1f1f1f"/>`;
     g+=`<circle cx="${x12}" cy="${midY+ch}" r="3.5" fill="#1f1f1f"/>`;
   }
-  // fret numbers
+  // fret numbers (bottom)
   for(let f=0;f<=FRETS;f++){
     const x=ml+f*cw+cw/2;
-    g+=`<text x="${x}" y="${mt-8}" text-anchor="middle" fill="#444" font-size="9" font-family="monospace">${f}</text>`;
+    g+=`<text x="${x}" y="${H-3}" text-anchor="middle" fill="#555" font-size="9" font-family="monospace">${f}</text>`;
   }
   // string labels
   ['①','②','③','④','⑤','⑥'].forEach((lbl,i)=>{
