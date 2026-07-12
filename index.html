@@ -669,6 +669,72 @@ function toggleSidebar(){
 }
 
 /* ── Fretboard ── */
+function scaleHeaderSVG(){
+  const cw=44,FRETS=15,ml=20,mr=8;
+  const W=ml+(FRETS+1)*cw+mr, H=122;
+  const u=(W-ml-mr)/12, nx=s=>ml+s*u;
+  const NOTES=[
+    {name:'C',semi:0, sol:'Do', num:'1',root:true},
+    {name:'D',semi:2, sol:'Re', num:'2',root:false},
+    {name:'E',semi:4, sol:'Mi', num:'3',root:false},
+    {name:'F',semi:5, sol:'Fa', num:'4',root:false},
+    {name:'G',semi:7, sol:'Sol',num:'5',root:false},
+    {name:'A',semi:9, sol:'La', num:'6',root:false},
+    {name:'B',semi:11,sol:'Si', num:'7',root:false},
+    {name:'C',semi:12,sol:'Do', num:'1',root:true,high:true},
+  ];
+  const IVS=[
+    {a:0, b:2, lbl:'全音',w:true},
+    {a:2, b:4, lbl:'全音',w:true},
+    {a:4, b:5, lbl:'半音',w:false},
+    {a:5, b:7, lbl:'全音',w:true},
+    {a:7, b:9, lbl:'全音',w:true},
+    {a:9, b:11,lbl:'全音',w:true},
+    {a:11,b:12,lbl:'半音',w:false},
+  ];
+  const yLbl=12,yBar=23,yVEnd=35,yNote=58,r=12,yRuler=78,ySol=97,yNum=113;
+  let g=`<svg viewBox="0 0 ${W} ${H}" xmlns="http://www.w3.org/2000/svg" style="width:100%;display:block;height:auto">`;
+  g+=`<rect width="${W}" height="${H}" fill="#131313"/>`;
+  // 全/半音括號
+  for(const iv of IVS){
+    const x1=nx(iv.a),x2=nx(iv.b),mx=(x1+x2)/2,col=iv.w?'#5b8dd9':'#c84b4b';
+    g+=`<text x="${mx}" y="${yLbl}" text-anchor="middle" fill="${col}" font-size="9" font-family="monospace" font-weight="600">${iv.lbl}</text>`;
+    g+=`<line x1="${x1}" y1="${yBar}" x2="${x2}" y2="${yBar}" stroke="${col}" stroke-width="1.5"/>`;
+    g+=`<line x1="${x1}" y1="${yBar}" x2="${x1}" y2="${yVEnd}" stroke="${col}" stroke-width="1.5"/>`;
+    g+=`<line x1="${x2}" y1="${yBar}" x2="${x2}" y2="${yVEnd}" stroke="${col}" stroke-width="1.5"/>`;
+  }
+  // 音名圈
+  for(const n of NOTES){
+    const x=nx(n.semi);
+    if(n.root){
+      g+=`<circle cx="${x}" cy="${yNote}" r="${r}" fill="rgba(200,75,75,.22)" stroke="#c84b4b" stroke-width="1.8" stroke-dasharray="4,2.5"/>`;
+      g+=`<text x="${x}" y="${yNote}" text-anchor="middle" dominant-baseline="central" fill="#c84b4b" font-size="10" font-family="monospace" font-weight="bold">C</text>`;
+    } else {
+      g+=`<circle cx="${x}" cy="${yNote}" r="${r}" fill="#e8c97a"/>`;
+      g+=`<text x="${x}" y="${yNote}" text-anchor="middle" dominant-baseline="central" fill="#1a1a1a" font-size="10" font-family="monospace" font-weight="bold">${n.name}</text>`;
+    }
+  }
+  // 半音尺標
+  const DIAT=new Set([0,2,4,5,7,9,11,12]);
+  g+=`<line x1="${ml}" y1="${yRuler}" x2="${W-mr}" y2="${yRuler}" stroke="#2a2a2a" stroke-width="1.5"/>`;
+  for(let i=0;i<=12;i++){
+    const x=nx(i),isD=DIAT.has(i),th=isD?9:5;
+    g+=`<line x1="${x}" y1="${yRuler-th/2}" x2="${x}" y2="${yRuler+th/2}" stroke="${isD?'#3a3a3a':'#252525'}" stroke-width="${isD?1.5:1}"/>`;
+  }
+  // 唱名 + 簡譜
+  for(const n of NOTES){
+    const x=nx(n.semi),col=n.root?'#c84b4b':'#bbb';
+    g+=`<text x="${x}" y="${ySol}" text-anchor="middle" dominant-baseline="central" fill="${col}" font-size="8.5" font-family="sans-serif">${n.sol}</text>`;
+    g+=`<text x="${x}" y="${yNum}" text-anchor="middle" dominant-baseline="central" fill="${col}" font-size="9" font-family="monospace">${n.num}</text>`;
+    if(n.high){
+      g+=`<circle cx="${x+5}" cy="${ySol-10}" r="1.8" fill="${col}"/>`;
+      g+=`<circle cx="${x+5}" cy="${yNum-9}" r="1.8" fill="${col}"/>`;
+    }
+  }
+  // 底部分隔線
+  g+=`<line x1="${ml}" y1="${H-1}" x2="${W-mr}" y2="${H-1}" stroke="#1e1e1e" stroke-width="1"/>`;
+  return g+'</svg>';
+}
 function fretboardSVG(){
   const TUNING=['E','B','G','D','A','E'];
   const CHROMATIC=['C','C#','D','D#','E','F','F#','G','G#','A','A#','B'];
@@ -676,8 +742,8 @@ function fretboardSVG(){
   const FRETS=15,STRINGS=6;
   const cw=44,ch=28,ml=20,mr=8,mt=14,mb=22,r=10;
   const W=ml+(FRETS+1)*cw+mr, H=mt+(STRINGS-1)*ch+mb;
-  let g=`<svg viewBox="0 0 ${W} ${H}" xmlns="http://www.w3.org/2000/svg" style="width:100%;min-width:560px;height:auto;display:block">`;
-  g+=`<rect width="${W}" height="${H}" fill="#131313" rx="8"/>`;
+  let g=`<svg viewBox="0 0 ${W} ${H}" xmlns="http://www.w3.org/2000/svg" style="width:100%;display:block;height:auto">`;
+  g+=`<rect width="${W}" height="${H}" fill="#131313"/>`;
   // strings
   for(let i=0;i<STRINGS;i++){
     const y=mt+i*ch, sw=0.7+i*0.28;
@@ -737,8 +803,11 @@ function renderFretboard(){
       <span><span class="fb-legend-c"></span>C 根音（Root）</span>
       <span><span class="fb-legend-n"></span>C 大調音階（C D E F G A B）</span>
     </div>
-    <div style="overflow-x:auto;-webkit-overflow-scrolling:touch;border-radius:8px">
-      ${fretboardSVG()}
+    <div style="overflow-x:auto;-webkit-overflow-scrolling:touch">
+      <div style="min-width:560px;background:#131313;border-radius:8px;overflow:hidden">
+        ${scaleHeaderSVG()}
+        ${fretboardSVG()}
+      </div>
     </div>
     <div style="font-size:.72rem;color:#bbb;margin-top:10px;line-height:1.7">
       先找到 C 根音（紅圈），再利用 C 大調音階指型延伸到其他音，即可逐步理解全指板音階分布。
