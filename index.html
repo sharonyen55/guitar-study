@@ -732,16 +732,16 @@ function fretboardSVG(){
 }
 function renderFretboard(){
   document.getElementById('fretboard-view').innerHTML=`
-    <div class="home-title">🎸 C 大調全指板音名</div>
+    <div class="home-title">🎸 C 大調音階（全指板）</div>
     <div class="fb-legend">
-      <span><span class="fb-legend-c"></span>根音 C</span>
+      <span><span class="fb-legend-c"></span>C 根音（Root）</span>
       <span><span class="fb-legend-n"></span>C 大調音階（C D E F G A B）</span>
     </div>
     <div style="overflow-x:auto;-webkit-overflow-scrolling:touch;border-radius:8px">
       ${fretboardSVG()}
     </div>
     <div style="font-size:.72rem;color:#bbb;margin-top:10px;line-height:1.7">
-      掌握 C 根音位置後，再搭配 C 大調音階指型，即可理解全指板音階分布。
+      先找到 C 根音（紅圈），再利用 C 大調音階指型延伸到其他音，即可逐步理解全指板音階分布。
     </div>
   `;
 }
