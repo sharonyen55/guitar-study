@@ -162,6 +162,11 @@ body{background:#0f0f0f;color:#e0e0e0;font-family:'Segoe UI',sans-serif;min-heig
 
 /* ── Train view ── */
 #train-view{display:none}
+/* ── Fretboard view ── */
+#fretboard-view{display:none}
+.fb-legend{display:flex;align-items:center;gap:18px;flex-wrap:wrap;margin-bottom:14px;font-size:.78rem;color:#bbb}
+.fb-legend-c{display:inline-block;width:16px;height:16px;border-radius:50%;border:1.8px dashed #c84b4b;background:rgba(200,75,75,.22);vertical-align:middle;margin-right:5px}
+.fb-legend-n{display:inline-block;width:16px;height:16px;border-radius:50%;background:#e8c97a;vertical-align:middle;margin-right:5px}
 .train-sec{background:#141414;border:1px solid #222;border-radius:12px;padding:20px;margin-bottom:18px}
 .train-sec-hd{font-size:.72rem;font-weight:700;color:#555;text-transform:uppercase;letter-spacing:.07em;margin-bottom:14px}
 
@@ -253,6 +258,9 @@ body{background:#0f0f0f;color:#e0e0e0;font-family:'Segoe UI',sans-serif;min-heig
       <button class="nav-item" id="nav-train" onclick="switchTab('train')">
         <span class="nav-icon">💪</span>肌肉記憶測驗
       </button>
+      <button class="nav-item" id="nav-fretboard" onclick="switchTab('fretboard')">
+        <span class="nav-icon">🎸</span>指板音名圖
+      </button>
       <button class="nav-item" id="nav-songs" onclick="switchTab('songs')" style="justify-content:space-between">
         <span><span class="nav-icon">📄</span>吉他譜</span>
         <span id="songs-nav-arrow" style="font-size:.65rem;transition:transform .25s;display:inline-block">▶</span>
@@ -268,6 +276,7 @@ body{background:#0f0f0f;color:#e0e0e0;font-family:'Segoe UI',sans-serif;min-heig
   <div id="chord-view"></div>
   <div id="song-view"></div>
   <div id="train-view"></div>
+  <div id="fretboard-view"></div>
 </div>
 
 <!-- Chord popup -->
@@ -659,24 +668,103 @@ function toggleSidebar(){
   document.getElementById('sidebar').classList.toggle('collapsed');
 }
 
+/* ── Fretboard ── */
+function fretboardSVG(){
+  const TUNING=['E','B','G','D','A','E'];
+  const CHROMATIC=['C','C#','D','D#','E','F','F#','G','G#','A','A#','B'];
+  const C_MAJOR=new Set(['C','D','E','F','G','A','B']);
+  const FRETS=15,STRINGS=6;
+  const cw=44,ch=28,ml=20,mr=8,mt=20,mb=14,r=10;
+  const W=ml+(FRETS+1)*cw+mr, H=mt+(STRINGS-1)*ch+mb;
+  let g=`<svg viewBox="0 0 ${W} ${H}" xmlns="http://www.w3.org/2000/svg" style="width:100%;min-width:560px;height:auto;display:block">`;
+  g+=`<rect width="${W}" height="${H}" fill="#131313" rx="8"/>`;
+  // strings
+  for(let i=0;i<STRINGS;i++){
+    const y=mt+i*ch, sw=0.7+i*0.28;
+    g+=`<line x1="${ml}" y1="${y}" x2="${W-mr}" y2="${y}" stroke="#333" stroke-width="${sw}"/>`;
+  }
+  // nut
+  const nutX=ml+cw;
+  g+=`<line x1="${nutX}" y1="${mt-5}" x2="${nutX}" y2="${mt+(STRINGS-1)*ch+5}" stroke="#777" stroke-width="3"/>`;
+  // fret lines
+  for(let f=2;f<=FRETS;f++){
+    const x=ml+f*cw;
+    g+=`<line x1="${x}" y1="${mt}" x2="${x}" y2="${mt+(STRINGS-1)*ch}" stroke="#252525" stroke-width="1"/>`;
+  }
+  // inlay dots
+  const midY=mt+(STRINGS-1)*ch/2;
+  for(const f of [3,5,7,9,15]){
+    if(f>FRETS)continue;
+    g+=`<circle cx="${ml+f*cw+cw/2}" cy="${midY}" r="3.5" fill="#1f1f1f"/>`;
+  }
+  if(FRETS>=12){
+    const x12=ml+12*cw+cw/2;
+    g+=`<circle cx="${x12}" cy="${midY-ch}" r="3.5" fill="#1f1f1f"/>`;
+    g+=`<circle cx="${x12}" cy="${midY+ch}" r="3.5" fill="#1f1f1f"/>`;
+  }
+  // fret numbers
+  for(let f=0;f<=FRETS;f++){
+    const x=ml+f*cw+cw/2;
+    g+=`<text x="${x}" y="${mt-8}" text-anchor="middle" fill="#444" font-size="9" font-family="monospace">${f}</text>`;
+  }
+  // string labels
+  ['①','②','③','④','⑤','⑥'].forEach((lbl,i)=>{
+    g+=`<text x="${ml-5}" y="${mt+i*ch+1}" text-anchor="end" dominant-baseline="central" fill="#555" font-size="10">${lbl}</text>`;
+  });
+  // notes
+  for(let str=0;str<STRINGS;str++){
+    const openIdx=CHROMATIC.indexOf(TUNING[str]);
+    const y=mt+str*ch;
+    for(let f=0;f<=FRETS;f++){
+      const note=CHROMATIC[(openIdx+f)%12];
+      if(!C_MAJOR.has(note))continue;
+      const x=ml+f*cw+cw/2;
+      if(note==='C'){
+        g+=`<circle cx="${x}" cy="${y}" r="${r}" fill="rgba(200,75,75,.22)" stroke="#c84b4b" stroke-width="1.8" stroke-dasharray="4,2.5"/>`;
+      } else {
+        g+=`<circle cx="${x}" cy="${y}" r="${r}" fill="#e8c97a"/>`;
+        g+=`<text x="${x}" y="${y}" text-anchor="middle" dominant-baseline="central" fill="#1a1a1a" font-size="9.5" font-family="monospace" font-weight="bold">${note}</text>`;
+      }
+    }
+  }
+  return g+'</svg>';
+}
+function renderFretboard(){
+  document.getElementById('fretboard-view').innerHTML=`
+    <div class="home-title">🎸 C 大調全指板音名</div>
+    <div class="fb-legend">
+      <span><span class="fb-legend-c"></span>根音 C</span>
+      <span><span class="fb-legend-n"></span>C 大調音（D E F G A B）</span>
+    </div>
+    <div style="overflow-x:auto;-webkit-overflow-scrolling:touch;border-radius:8px">
+      ${fretboardSVG()}
+    </div>
+    <div style="font-size:.72rem;color:#555;margin-top:10px;line-height:1.7">
+      共 7 個音，遍佈全指板。掌握 C 根音位置（紅圈）後，其餘音自然連成音階形狀。
+    </div>
+  `;
+}
+
 /* ── Tab switching ── */
 function switchTab(t){
   curTab=t;
-  ['chord','songs','train'].forEach(id=>{
+  ['chord','songs','train','fretboard'].forEach(id=>{
     document.getElementById('nav-'+id)?.classList.toggle('active', id===t);
   });
-  document.getElementById('home-view').style.display  = t==='home'  ?'block':'none';
-  document.getElementById('chord-view').style.display = t==='chord' ?'block':'none';
-  document.getElementById('song-view').style.display  = t==='songs' ?'block':'none';
-  document.getElementById('train-view').style.display = t==='train' ?'block':'none';
-  document.getElementById('song-list').style.display  = t==='songs' ?'block':'none';
+  document.getElementById('home-view').style.display       = t==='home'      ?'block':'none';
+  document.getElementById('chord-view').style.display      = t==='chord'     ?'block':'none';
+  document.getElementById('song-view').style.display       = t==='songs'     ?'block':'none';
+  document.getElementById('train-view').style.display      = t==='train'     ?'block':'none';
+  document.getElementById('fretboard-view').style.display  = t==='fretboard' ?'block':'none';
+  document.getElementById('song-list').style.display       = t==='songs'     ?'block':'none';
   const arr=document.getElementById('songs-nav-arrow');
   if(arr) arr.style.transform = t==='songs'?'rotate(90deg)':'rotate(0deg)';
   if(t!=='train') stopDetector();
-  if(t==='home')  { curSong=null; renderHome(); }
-  if(t==='chord') renderChords();
-  if(t==='songs') renderSongList();
-  if(t==='train') renderTrain();
+  if(t==='home')       { curSong=null; renderHome(); }
+  if(t==='chord')      renderChords();
+  if(t==='songs')      renderSongList();
+  if(t==='train')      renderTrain();
+  if(t==='fretboard')  renderFretboard();
   renderSidebar();
 }
 
