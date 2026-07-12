@@ -762,7 +762,7 @@ function renderChords(){
         const diffChip=dl?`<div style="font-size:.72rem;color:#e8c97a;letter-spacing:1px;margin-bottom:2px">${'★'.repeat(c.difficulty)}</div>`:'';
         const memTip=MEMORY_TIPS[c.id]?`<div class="c-memory-tip">${MEMORY_TIPS[c.id]}</div>`:'';
         const diff=DIFF_HINTS[c.id];
-        const diffMsg=diff?`<div class="diff-msg">👆 ${diff.text}</div>`:'';
+        const diffMsg=diff?`<div class="diff-msg">💡 ${diff.text}</div>`:'';
         const proto=BARRE_PROTOTYPES[c.id];
         const protoBtn=proto?`<button class="proto-btn" onclick="event.stopPropagation();showProto('${c.id}')">🔍 顯示原型</button>`:'';
         return `
@@ -1024,7 +1024,7 @@ function renderFCCard(){
     <div class="fc-full">${c.full}</div>
     ${fc.revealed?`
       <div class="fc-diagram revealed ghost-on">${chordSVG(c,150,{ghosts:DIFF_HINTS[c.id]?.ghosts})}</div>
-      ${DIFF_HINTS[c.id]?`<div style="font-size:.7rem;color:#c84b4b;margin-top:-6px">👆 ${DIFF_HINTS[c.id].text}</div>`:''}
+      ${DIFF_HINTS[c.id]?`<div style="font-size:.7rem;color:#c84b4b;margin-top:-6px">💡 ${DIFF_HINTS[c.id].text}</div>`:''}
       <div class="fc-ctrls">
         <button class="fc-btn fc-btn-got" onclick="fcGot()">✅ 記住了</button>
         <button class="fc-btn fc-btn-miss" onclick="fcMiss()">🔄 再練</button>
@@ -1259,7 +1259,7 @@ function showPopup(id,e){
   const diffH=DIFF_HINTS[id];
   document.getElementById('popup-diagram').innerHTML=`<div class="${diffH?'ghost-on':''}">${chordSVG(ch,150,{ghosts:diffH?.ghosts})}</div>`;
   const diffEl=document.getElementById('popup-diff');
-  if(diffEl){ diffEl.style.display=diffH?'':'none'; if(diffH) diffEl.textContent='👆 '+diffH.msg; }
+  if(diffEl){ diffEl.style.display=diffH?'':'none'; if(diffH) diffEl.textContent='💡 '+diffH.text; }
   updatePopupLearnBtn();
   pop.style.left=Math.min(e.clientX-80,window.innerWidth-200)+'px';
   pop.style.top=(e.clientY+12)+'px';
